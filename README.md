@@ -1,1 +1,1 @@
-# hetel-reservation-spring
+# hotel-reservation-spring
