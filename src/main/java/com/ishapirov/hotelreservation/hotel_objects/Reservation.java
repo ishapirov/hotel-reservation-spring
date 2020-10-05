@@ -17,14 +17,18 @@ import lombok.Data;
 @AllArgsConstructor
 @Entity
 @Table(name = "reservation")
-public class Reservation implements Serializable{
-    @Id
+public class Reservation extends DatesInterval implements Serializable{
+    public Reservation() {
+        
+	}
+	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
     private Integer registrationNumber;
     @ManyToOne
-    @JoinColumn(name="c_id",referencedColumnName = "customer_id")
+    @JoinColumn(name="c_id")
     private Customer customer;
     @ManyToOne
-    @JoinColumn(name="r_num",referencedColumnName = "room_number")
+    @JoinColumn(name="r_num")
     private Room room;
+
 }

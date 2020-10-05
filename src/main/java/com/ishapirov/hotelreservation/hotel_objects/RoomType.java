@@ -2,6 +2,7 @@ package com.ishapirov.hotelreservation.hotel_objects;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -16,6 +17,6 @@ import lombok.Setter;
 public class RoomType implements Serializable{
     @Id
     private String name;
-    private double price;
-
+    @Column(name = "default_price")
+    private double defaultPrice;
 }
