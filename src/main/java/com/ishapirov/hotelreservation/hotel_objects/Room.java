@@ -7,24 +7,26 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "room")
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
-// @NamedQuery(name = "findAvailableRooms", query = "SELECT * FROM ")
 public class Room {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name="room_number")
-	private final Integer roomNumber;
+	private Integer roomNumber;
 	
 	@ManyToOne
 	@JoinColumn(name="room_type")
-	private final RoomType roomType;
+	private RoomType roomType;
 
 	private double room_price;
 

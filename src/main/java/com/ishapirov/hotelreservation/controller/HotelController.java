@@ -1,5 +1,9 @@
 package com.ishapirov.hotelreservation.controller;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,6 +14,7 @@ import com.ishapirov.hotelreservation.controller_objects.AvailableRoom;
 import com.ishapirov.hotelreservation.controller_objects.AvailableRoomNoType;
 import com.ishapirov.hotelreservation.controller_objects.BookRoom;
 import com.ishapirov.hotelreservation.controller_objects.BookRoomForCustomer;
+import com.ishapirov.hotelreservation.controller_objects.RoomTypeName;
 import com.ishapirov.hotelreservation.hotel_objects.Customer;
 import com.ishapirov.hotelreservation.hotel_objects.Reservation;
 import com.ishapirov.hotelreservation.hotel_objects.Room;
@@ -37,7 +42,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class HotelController {
- 
+
     @Autowired
     private CustomerRepository customerRepository;
     @Autowired
@@ -54,91 +59,118 @@ public class HotelController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
     @GetMapping("test")
     public String test() {
-        UserDetails userDetails = (UserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();    
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return userDetails.getUsername() + userDetails.getAuthorities();
     }
-    
+
     @Transactional
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("signup")
-    public Response signup(@RequestBody Customer customer){
-            customer.setPassword(passwordEncoder.encode(customer.getPassword()));
-            customerRepository.save(customer);
-            return new Response("Sign in successful");
+    public Response signup(@RequestBody Customer customer) {
+        customer.setPassword(passwordEncoder.encode(customer.getPassword()));
+        customerRepository.save(customer);
+        return new Response("Sign in successful");
     }
 
     @PostMapping("/authenticate")
-    public String generateToken(@RequestBody CustomerCredentials customerCredentials) throws Exception{
-        try{
-            authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(customerCredentials.getUsername(), customerCredentials.getPassword())
-            );
-        }
-        catch (Exception ex){
+    public String generateToken(@RequestBody CustomerCredentials customerCredentials) throws Exception {
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                    customerCredentials.getUsername(), customerCredentials.getPassword()));
+        } catch (Exception ex) {
             throw new Exception("invalid username or password");
         }
         return jwtUtil.generateToken(customerCredentials.getUsername());
     }
 
     @GetMapping("/getallrooms")
-    public List<Room> getAllRooms(){    
+    public List<Room> getAllRooms() {
         return roomRepository.findAll();
     }
 
     @GetMapping("/getroomsbytype")
-    public List<Room> getRoomsByType(@RequestBody String roomTypeName){
-        Optional<RoomType> roomType = roomTypeRepository.findByName(roomTypeName);
-        if(roomType.isPresent())
+    public List<Room> getRoomsByType(@RequestBody RoomTypeName roomTypeName) {
+        Optional<RoomType> roomType = roomTypeRepository.findByName(roomTypeName.getRoomTypeName());
+        if (roomType.isPresent())
             return roomRepository.findByRoomType(roomType.get());
         else
             return null;
     }
 
-    // Queries don't work yet
-    // @GetMapping("/getavailableroomsbytype")
-    // public List<Room> getAvailableRoomsByType(@RequestBody AvailableRoom availableRoom){
-    //     return roomRepository.findAllAvailableType(availableRoom.getRoomtypeName(), availableRoom.getCheckinDate(), availableRoom.getCheckoutDate());
-    // }
+    @GetMapping("/getavailablerooms")
+    public List<Room> getAvailableRooms(@RequestBody AvailableRoomNoType availableRoom) throws ParseException {
+        List<Room> rooms = roomRepository.findAll();
+        return returnRooms(rooms, availableRoom.getCheckInDate(),availableRoom.getCheckOutDate());
+    }
 
-    // @GetMapping("/getavailablerooms")
-    // public List<Room> getAvailableRooms(@RequestBody AvailableRoomNoType availableRoom){
-    //     return roomRepository.findAllAvailableNoType(availableRoom.getCheckinDate(), availableRoom.getCheckoutDate());
-    // }
+    @GetMapping("/getavailableroomsbytype")
+    public List<Room> getAvailableRoomsByType(@RequestBody AvailableRoom availableRoom) throws ParseException {
+        Optional<RoomType> roomType = roomTypeRepository.findByName(availableRoom.getRoomtypeName());
+        if (roomType.isPresent()) {
+            List<Room> rooms = roomRepository.findByRoomType(roomType.get());
+            return returnRooms(rooms, availableRoom.getCheckInDate(),availableRoom.getCheckOutDate());
+        }
+        return null;
+
+    }
+
+    public List<Room> returnRooms(List<Room> rooms,String checkin,String checkout) throws ParseException {
+        List<Room> availableRooms = new ArrayList<>();
+        for (Room room : rooms){
+            List<Reservation> reservations = reservationRepository.findByRoom(room);
+            Date checkinDate = dateFormat.parse(checkin);
+            Date checkoutDate = dateFormat.parse(checkout);
+            if(isDateAvailable(reservations, checkinDate, checkoutDate))
+                availableRooms.add(room);
+        }
+        return availableRooms;
+    }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("bookRoomForCustomer")
-    public Response bookRoomForCustomer(@RequestBody BookRoomForCustomer bookRoomForCustomer){
+    public Response bookRoomForCustomer(@RequestBody BookRoomForCustomer bookRoomForCustomer) throws ParseException {
         Optional<Customer> customer = customerRepository.findByUsername(bookRoomForCustomer.getUsername());
         Optional<Room> room = roomRepository.findByRoomNumber(bookRoomForCustomer.getRoomNumber());
         if(!customer.isPresent())
             return new Response("Customer not found");
         if(!room.isPresent())
             return new Response("Room not found");
-        // Query doesn't work yet
-        // if(reservationRepository.isRoomAvailable(bookRoomForCustomer.getRoomNumber(), bookRoomForCustomer.getCheckInDate(), bookRoomForCustomer.getCheckOutDate()) != 0)
-        //     return new Response("The Room has already been reserved for this time");
-        
+        Date checkInDate = dateFormat.parse(bookRoomForCustomer.getCheckInDate());
+        Date checkOutDate = dateFormat.parse(bookRoomForCustomer.getCheckOutDate());
+        List<Reservation> reservations = reservationRepository.findByRoom(room.get());
+        if(!isDateAvailable(reservations, checkInDate, checkOutDate)){
+            return new Response("The Room has already been reserved for this time");  
+        }
+       
         Reservation reservation = new Reservation();
-        reservation.setCustomer(customer.get());
-        reservation.setRoom(room.get());
-        reservation.setDateCheckIn(bookRoomForCustomer.getCheckInDate());
-        reservation.setDateCheckOut(bookRoomForCustomer.getCheckOutDate());
-        reservationRepository.save(reservation);
-        return new Response("Customer has been successfully booked");
+            reservation.setCustomer(customer.get());
+            reservation.setRoom(room.get());
+            reservation.setDateCheckIn(checkInDate);
+            reservation.setDateCheckOut(checkOutDate);
+            reservationRepository.save(reservation);
+            return new Response("Customer has been successfully booked");
+       
     }
 
-    @PreAuthorize("hasRole('ROLE_USER')")
-    @PostMapping("bookRoom")
-    public Response bookRoom(@RequestBody BookRoom bookRoom){
+    @PostMapping("bookroom")
+    public Response bookRoom(@RequestBody BookRoom bookRoom) throws ParseException {
         UserDetails userDetails = (UserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String username = userDetails.getUsername();
         BookRoomForCustomer bookRoomForCustomer = new BookRoomForCustomer(username,bookRoom);
         return bookRoomForCustomer(bookRoomForCustomer);
     }
 
-
- 
+    private boolean isDateAvailable(List<Reservation> reservations,Date checkin, Date checkout){
+        for(Reservation reservation: reservations){
+            if(!reservation.isAvailable(checkin, checkout)){
+                return false;
+            }
+        }
+        return true;
+    }
 }

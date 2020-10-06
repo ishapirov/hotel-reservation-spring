@@ -15,19 +15,12 @@ public abstract class DatesInterval {
     @Column(name = "checkout")
     private Date dateCheckOut;
 
-    // public boolean checkIfAvailable(Date otherDateCheckIn, Date otherDateCheckOut) {
-    //     	for (DatesBookedInterval dates : datesBooked.values()){
-    //     		if(otherDateCheckIn.compareTo(dates.getDateCheckOut()) > 0 || otherDateCheckOut.compareTo(dates.getDateCheckIn()) < 0)
-    //     		return true;
-    //     	}
-    //     	return false;
-    //     }
-    
-    //     public void updateDates(Integer userID,DatesBookedInterval datesBookedInterval) {
-    //     	this.datesBooked.put(userID,datesBookedInterval);
-    //     }
-    
-    //     public void clearDateInterval(int userID) {
-    //     	this.datesBooked.remove(userID);
-    //     }
+    public boolean isAvailable(Date otherDateCheckIn, Date otherDateCheckOut) {
+        if((this.dateCheckIn.compareTo(otherDateCheckIn) >= 0 && this.dateCheckIn.compareTo(otherDateCheckOut) < 0) 
+            || (this.dateCheckOut.compareTo(otherDateCheckIn) > 0 && this.dateCheckOut.compareTo(otherDateCheckOut) <= 0) 
+            || (this.dateCheckIn.compareTo(otherDateCheckIn) <= 0 && this.dateCheckOut.compareTo(otherDateCheckOut) >= 0)){
+            return false;
+        }
+        return true;
+    }
 }
