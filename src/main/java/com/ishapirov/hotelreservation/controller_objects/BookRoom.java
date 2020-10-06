@@ -8,6 +8,6 @@ import lombok.Data;
 public class BookRoom {
     
     private Integer roomNumber;
-    private Date checkInDate;
-    private Date checkOutDate;
+    private String checkInDate;
+    private String checkOutDate;
 }

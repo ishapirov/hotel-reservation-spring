@@ -11,6 +11,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public class SecurityUser implements UserDetails {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 3202378890736699195L;
     private final String username;
     private final String password;
     private final Collection<? extends GrantedAuthority> grantedAuthorities;
@@ -23,6 +27,16 @@ public class SecurityUser implements UserDetails {
         this.username = username;
         this.password = password;
         this.grantedAuthorities = Arrays.asList(new SimpleGrantedAuthority("ROLE_USER"));
+        this.isAccountNonExpired = true;
+        this.isAccountNonLocked = true;
+        this.isCredentialsNonExpired = true;
+        this.isEnabled = true;
+    }
+
+    public SecurityUser(String username, String password,Collection<? extends GrantedAuthority> grantedAuthorities) {
+        this.username = username;
+        this.password = password;
+        this.grantedAuthorities = grantedAuthorities;
         this.isAccountNonExpired = true;
         this.isAccountNonLocked = true;
         this.isCredentialsNonExpired = true;

@@ -12,12 +12,16 @@ import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
 @AllArgsConstructor
 @Entity
 @Table(name = "reservation")
+@EqualsAndHashCode(callSuper = true)
 public class Reservation extends DatesInterval implements Serializable{
+    private static final long serialVersionUID = -5960526503459035821L;
+
     public Reservation() {
         
 	}

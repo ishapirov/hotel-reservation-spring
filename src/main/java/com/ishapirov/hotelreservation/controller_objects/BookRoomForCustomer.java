@@ -1,15 +1,13 @@
 package com.ishapirov.hotelreservation.controller_objects;
 
-import java.util.Date;
-
 import lombok.Data;
 
 @Data
 public class BookRoomForCustomer {
 	private String username;
     private Integer roomNumber;
-    private Date checkInDate;
-    private Date checkOutDate;
+    private String checkInDate;
+    private String checkOutDate;
 
     public BookRoomForCustomer(String username, BookRoom bookRoom) {
         this.username = username;

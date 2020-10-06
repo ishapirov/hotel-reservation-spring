@@ -1,12 +1,15 @@
 package com.ishapirov.hotelreservation.controller_objects;
 
-import java.util.Date;
-
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class AvailableRoom {
     private String roomtypeName;
-    private Date checkinDate;
-    private Date checkoutDate;
+    //Dates must be in yyyy-mm-dd format
+    private String checkInDate;
+    private String checkOutDate;
 }
