@@ -96,7 +96,6 @@ public class TokenRequiredTest extends BaseClass {
     @Test
     public void testBookRoomThenVerifyThenCancel() throws JsonProcessingException, URISyntaxException {
         String token = BaseClass.getToken();
-        System.out.println(token);
         Map<String,String> headers = new HashMap<>();
         headers.put("Authorization",token);
 
@@ -121,7 +120,17 @@ public class TokenRequiredTest extends BaseClass {
         JsonPath jsonPath = new JsonPath(response.thenReturn().asString());
         CancelReservation cancelReservation = new CancelReservation(jsonPath.getInt("reservationNumber"));
         json = mapper.writeValueAsString(cancelReservation);
-        System.out.println(jsonPath.getInt("reservationNumber"));
+
+        given()
+        .contentType(ContentType.JSON)
+        .headers(headers)
+        .accept(ContentType.JSON)
+        .param("reservationNumber", jsonPath.getInt("reservationNumber"))
+        .when().get(new URI("/viewreservation"))
+        .then()
+        .assertThat().statusCode(HttpStatus.SC_OK)
+        .body("customer.username",equalTo(BaseClass.getUsername()));
+
 
         token = BaseClass.getToken();
         headers = new HashMap<>();
