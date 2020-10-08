@@ -27,7 +27,7 @@ public class Reservation extends DatesInterval implements Serializable{
 	}
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer registrationNumber;
+    private Integer reservationNumber;
     @ManyToOne
     @JoinColumn(name="c_id")
     private Customer customer;

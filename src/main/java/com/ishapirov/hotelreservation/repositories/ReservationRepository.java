@@ -10,7 +10,8 @@ import com.ishapirov.hotelreservation.hotel_objects.Room;
 import org.springframework.data.repository.CrudRepository;
 
 public interface ReservationRepository extends CrudRepository<Reservation,Integer> {
-    Optional<Reservation>findByRegistrationNumber(Integer registrationNumber);
+    Optional<Reservation>findByReservationNumber(Integer reservationNumber);
     List<Reservation> findByCustomer(Customer customer);
     List<Reservation> findByRoom(Room room);
+    Long deleteByReservationNumber(Integer reservationNumber);
 }

@@ -28,12 +28,12 @@ public class Room {
 	@JoinColumn(name="room_type")
 	private RoomType roomType;
 
-	private double room_price;
+	private double roomPrice;
 
-	public Room(int roomNumber, RoomType typeOfRoom, double room_price){
+	public Room(int roomNumber, RoomType typeOfRoom, double roomPrice){
 		this.roomNumber = roomNumber;
 		this.roomType = typeOfRoom;
-		this.room_price = room_price;	
+		this.roomPrice = roomPrice;	
 	}
 
 }
