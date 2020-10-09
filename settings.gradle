@@ -1,1 +1,3 @@
 rootProject.name = 'hotelreservation'
+
+include 'api', 'api-test', 'app'

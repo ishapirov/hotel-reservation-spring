@@ -1,0 +1,37 @@
+plugins {
+    // Apply the java plugin to add support for Java
+    id 'java'
+    // Apply the application plugin to add support for building a CLI application.
+    id 'application'
+}
+
+repositories {
+    // Use jcenter for resolving dependencies.
+    // You can declare any Maven/Ivy/file repository here.
+    jcenter()
+    mavenCentral()
+}
+
+configurations {
+	compileOnly {
+        extendsFrom annotationProcessor
+	}
+}
+
+dependencies {
+    // This dependency is used by the application.
+    testCompileOnly 'org.projectlombok:lombok:1.18.14'
+	testAnnotationProcessor 'org.projectlombok:lombok:1.18.14'
+    implementation 'com.google.guava:guava:29.0-jre'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.3'
+    testImplementation 'io.rest-assured:rest-assured:4.3.1'
+    compile 'org.apache.commons:commons-lang3:3.11'
+
+    // Use JUnit test framework
+    testImplementation 'junit:junit:4.13'
+}
+
+application {
+    // Define the main class for the application.
+    mainClassName = 'hotel.reservation.apitesting.App'
+}
