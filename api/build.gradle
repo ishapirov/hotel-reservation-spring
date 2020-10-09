@@ -1,0 +1,22 @@
+
+plugins {
+    // Apply the java plugin to add support for Java
+    id 'java'
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    // This dependency is used by the application.
+    compileOnly 'org.projectlombok:lombok:1.18.12'
+    implementation 'com.google.guava:guava:29.0-jre'
+    compileOnly 'org.projectlombok:lombok'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.3'
+    testImplementation 'io.rest-assured:rest-assured:4.3.1'
+    compile 'org.apache.commons:commons-lang3:3.11'
+
+    // Use JUnit test framework
+    testImplementation 'junit:junit:4.13'
+}
