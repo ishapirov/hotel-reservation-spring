@@ -12,4 +12,3 @@ To run an individual module build (examples):
 To run api tests:
 
     ./gradlew api-test:build
-
