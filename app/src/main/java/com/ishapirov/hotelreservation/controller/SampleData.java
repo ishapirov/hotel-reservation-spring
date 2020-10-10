@@ -1,7 +1,7 @@
 package com.ishapirov.hotelreservation.controller;
 
-import com.ishapirov.hotelreservation.hotel_objects.Room;
-import com.ishapirov.hotelreservation.hotel_objects.RoomType;
+import com.ishapirov.hotelapi.Room;
+import com.ishapirov.hotelapi.RoomType;
 import com.ishapirov.hotelreservation.repositories.RoomRepository;
 import com.ishapirov.hotelreservation.repositories.RoomTypeRepository;
 

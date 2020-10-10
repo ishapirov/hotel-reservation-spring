@@ -1,9 +1,3 @@
-plugins {
-	id 'org.springframework.boot' version '2.3.4.RELEASE'
-	id 'io.spring.dependency-management' 
-	id 'java'
-}
-
 configurations {
 	compileOnly {
         extendsFrom annotationProcessor
@@ -27,6 +21,8 @@ dependencies {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}
 	testImplementation 'org.springframework.security:spring-security-test'
+
+	compile project(':api')
 }
 
 test {

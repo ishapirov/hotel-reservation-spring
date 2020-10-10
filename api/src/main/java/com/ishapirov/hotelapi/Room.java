@@ -1,4 +1,4 @@
-package com.ishapirov.hotelreservation.hotel_objects;
+package com.ishapirov.hotelapi;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

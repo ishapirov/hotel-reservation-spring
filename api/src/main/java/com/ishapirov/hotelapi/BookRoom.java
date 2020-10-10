@@ -1,12 +1,12 @@
-package com.ishapirov.hotelreservation.controller.classes;
+package com.ishapirov.hotelapi;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 import java.util.Date;
 
-import lombok.Data;
-
 @Data
+@AllArgsConstructor
 public class BookRoom {
-    
     private Integer roomNumber;
     private Date checkInDate;
     private Date checkOutDate;

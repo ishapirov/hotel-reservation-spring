@@ -1,4 +1,4 @@
-package com.ishapirov.hotelreservation.controller;
+package com.ishapirov.hotelapi;
 
 import lombok.Data;
 

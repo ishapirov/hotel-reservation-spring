@@ -1,4 +1,4 @@
-package com.ishapirov.hotelreservation.hotel_objects;
+package com.ishapirov.hotelapi;
 
 import java.io.Serializable;
 
@@ -30,4 +30,12 @@ public class Customer implements Serializable{
 	private String email;
 	private String firstName;
 	private String lastName;
+
+	public Customer(String username, String password, String email, String firstName, String lastName) {
+		this.username = username;
+		this.password = password;
+		this.email = email;
+		this.firstName = firstName;
+		this.lastName = lastName;
+	}
 }

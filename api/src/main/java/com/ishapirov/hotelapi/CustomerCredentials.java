@@ -1,4 +1,5 @@
-package com.ishapirov.hotelreservation.controller.classes;
+package com.ishapirov.hotelapi;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

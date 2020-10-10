@@ -6,9 +6,6 @@ package hotel.reservation.apitesting;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 
-import hotel.reservation.apitesting.testobjects.AvailableRoomNoType;
-import hotel.reservation.apitesting.testobjects.AvailableRoomType;
-import hotel.reservation.apitesting.testobjects.RoomTypeName;
 import io.restassured.http.ContentType;
 
 import static io.restassured.RestAssured.*;
@@ -17,7 +14,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static org.hamcrest.Matchers.*;
 
@@ -31,34 +27,41 @@ public class ApiTest extends BaseClass {
 
     @Test
     public void testGetExistingRoom() throws URISyntaxException {
-        given().accept(ContentType.JSON).param("roomnum", "756").when().get(new URI("/getroom")).then().assertThat()
-                .statusCode(HttpStatus.SC_OK).body("roomNumber", equalTo(756), "roomType.name", equalTo("Single"));
+        given()
+        .accept(ContentType.JSON)
+        .param("roomNumber", "756")
+        .when().get(new URI("/getroom"))
+        .then().assertThat()
+        .statusCode(HttpStatus.SC_OK).body("roomNumber", equalTo(756), "roomType.name", equalTo("Single"));
     }
 
     @Test
     public void testGetNonExistingRoom() throws URISyntaxException {
-        given().accept(ContentType.JSON).param("roomnum", "120").when().get(new URI("/getroom")).then().assertThat()
-                .statusCode(HttpStatus.SC_NOT_FOUND);
+        given()
+        .accept(ContentType.JSON)
+        .param("roomNumber", "120")
+        .when().get(new URI("/getroom"))
+        .then().assertThat()
+        .statusCode(HttpStatus.SC_NOT_FOUND);
     }
 
     @Test
     public void testGetAllRooms() throws URISyntaxException {
-        given().accept(ContentType.JSON).when().get(new URI("/getallrooms")).then().assertThat()
-                .statusCode(HttpStatus.SC_OK).body("size()", equalTo(100), "get(0).roomNumber", equalTo(754),
-                        "get(0).roomType.name", equalTo("Single"));
+        given().accept(ContentType.JSON)
+        .when().get(new URI("/getallrooms"))
+        .then().assertThat()
+        .statusCode(HttpStatus.SC_OK).body("size()", equalTo(100),
+         "get(0).roomNumber", equalTo(754),"get(0).roomType.name", equalTo("Single"));
 
     }
 
     @Test
     public void testGetRoomsByType() throws URISyntaxException, JsonProcessingException {
-        RoomTypeName roomTypeName = new RoomTypeName("Suite");
-        ObjectMapper mapper = new ObjectMapper();
-        String json = mapper.writeValueAsString(roomTypeName);
 
         given().contentType(ContentType.JSON)
-        .body(json)
+        .param("roomType","Suite")
         .accept(ContentType.JSON)
-        .when().get(new URI("/getroomsbytype")).then().assertThat()
+        .when().get(new URI("/getallrooms")).then().assertThat()
         .statusCode(HttpStatus.SC_OK)
         .body("size()",equalTo(25),"get(0).roomNumber",equalTo(804),"get(0).roomType.name",equalTo("Suite"));
         
@@ -69,12 +72,9 @@ public class ApiTest extends BaseClass {
         String d1 ="2020-10-10T17:24:56.081Z";
         String d2 ="2020-10-11T17:24:56.081Z";
 
-        AvailableRoomNoType availableRoomNoType = new AvailableRoomNoType(d1,d2);
-        ObjectMapper mapper = new ObjectMapper();
-        String json = mapper.writeValueAsString(availableRoomNoType);
-
         given().contentType(ContentType.JSON)
-        .body(json)
+        .param("checkInDate",d1)
+        .and().param("checkOutDate",d2)
         .accept(ContentType.JSON)
         .when().get(new URI("/getavailablerooms")).then().assertThat()
         .statusCode(HttpStatus.SC_OK)
@@ -88,17 +88,14 @@ public class ApiTest extends BaseClass {
         String d1 ="2020-10-10T17:24:56.081Z";
         String d2 ="2020-10-11T17:24:56.081Z";
 
-        AvailableRoomType availableRoomNoType = new AvailableRoomType(type,d1,d2);
-        ObjectMapper mapper = new ObjectMapper();
-        String json = mapper.writeValueAsString(availableRoomNoType);
-
         given().contentType(ContentType.JSON)
-        .body(json)
+        .param("checkInDate",d1)
+        .and().param("checkOutDate",d2)
+        .and().param("roomType",type)
         .accept(ContentType.JSON)
-        .when().get(new URI("/getavailableroomsbytype")).then().assertThat()
+        .when().get(new URI("/getavailablerooms")).then().assertThat()
         .statusCode(HttpStatus.SC_OK)
         .body("size()",equalTo(24),"get(0).roomNumber",equalTo(754),"get(1).roomNumber",equalTo(756));
     }
-
     
 }

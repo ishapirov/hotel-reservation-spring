@@ -1,4 +1,4 @@
-package hotel.reservation.apitesting.testobjects;
+package com.ishapirov.hotelapi;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

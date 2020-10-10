@@ -7,33 +7,17 @@ import java.util.Optional;
 
 import javax.transaction.Transactional;
 
-import com.ishapirov.hotelreservation.controller.classes.AvailableRoom;
-import com.ishapirov.hotelreservation.controller.classes.AvailableRoomNoType;
-import com.ishapirov.hotelreservation.controller.classes.BookRoom;
-import com.ishapirov.hotelreservation.controller.classes.BookRoomForCustomer;
-import com.ishapirov.hotelreservation.controller.classes.CancelReservation;
-import com.ishapirov.hotelreservation.controller.classes.CustomerCredentials;
-import com.ishapirov.hotelreservation.controller.classes.RoomTypeName;
-import com.ishapirov.hotelreservation.controller.classes.TokenClass;
-import com.ishapirov.hotelreservation.controller.exceptions.CustomerNotFoundException;
-import com.ishapirov.hotelreservation.controller.exceptions.InvalidUsernameOrPasswordException;
-import com.ishapirov.hotelreservation.controller.exceptions.ReservationNotFoundException;
-import com.ishapirov.hotelreservation.controller.exceptions.ReservationOverlapException;
-import com.ishapirov.hotelreservation.controller.exceptions.ReservationUsernamesDoNotMatchException;
-import com.ishapirov.hotelreservation.controller.exceptions.RoomNotFoundException;
-import com.ishapirov.hotelreservation.controller.exceptions.RoomTypeNotFoundException;
-import com.ishapirov.hotelreservation.hotel_objects.Customer;
-import com.ishapirov.hotelreservation.hotel_objects.Reservation;
-import com.ishapirov.hotelreservation.hotel_objects.Room;
-import com.ishapirov.hotelreservation.hotel_objects.RoomType;
+
+import com.ishapirov.hotelapi.*;
+import com.ishapirov.hotelapi.exceptions.*;
+
 import com.ishapirov.hotelreservation.repositories.CustomerRepository;
 import com.ishapirov.hotelreservation.repositories.ReservationRepository;
 import com.ishapirov.hotelreservation.repositories.RoomRepository;
 import com.ishapirov.hotelreservation.repositories.RoomTypeRepository;
 import com.ishapirov.hotelreservation.util.JwtUtil;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -44,12 +28,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class HotelController {
+public class HotelController implements HotelAPIInterface {
 
     @Autowired
     private CustomerRepository customerRepository;
@@ -79,9 +61,7 @@ public class HotelController {
     }
 
     @Transactional
-    @ResponseBody
-    @ResponseStatus(HttpStatus.OK)
-   @PostMapping("/signup")
+    @PostMapping("/signup")
     public Response signup(@RequestBody Customer customer) {
         customer.setPassword(passwordEncoder.encode(customer.getPassword()));
         customerRepository.save(customer);
@@ -89,7 +69,7 @@ public class HotelController {
     }
 
     @PostMapping("/authenticate")
-    public TokenClass generateToken(@RequestBody CustomerCredentials customerCredentials) throws Exception {
+    public TokenClass generateToken(@RequestBody CustomerCredentials customerCredentials) {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     customerCredentials.getUsername(), customerCredentials.getPassword()));
@@ -97,42 +77,55 @@ public class HotelController {
             throw new InvalidUsernameOrPasswordException();
         }
         return new TokenClass(jwtUtil.generateToken(customerCredentials.getUsername()));
-    } 
-
-    @GetMapping("/getallrooms")
-    public List<Room> getAllRooms() {
-        return roomRepository.findAll();
     }
 
     @GetMapping("/getroom")
-    public Room getRoom(@RequestParam(required = true) Integer roomnum) {
-        Optional<Room> room = roomRepository.findByRoomNumber(roomnum);
+    public Room getRoom(@RequestParam(required = true) Integer roomNumber) {
+        Optional<Room> room = roomRepository.findByRoomNumber(roomNumber);
         if(!room.isPresent())
             throw new RoomNotFoundException();
         return room.get();
     }
 
-    @GetMapping("/getroomsbytype")
-    public List<Room> getRoomsByType(@RequestBody RoomTypeName roomTypeName) {
-        Optional<RoomType> roomType = roomTypeRepository.findByName(roomTypeName.getRoomTypeName());
-        if (!roomType.isPresent())
+    @GetMapping("/getallrooms")
+    public List<Room> getRoomsByType(@RequestParam(required = false) String roomType) {
+        if(roomType == null)
+            return roomRepository.findAll();
+        Optional<RoomType> getRoomType = roomTypeRepository.findByName(roomType);
+        if (!getRoomType.isPresent())
             throw new RoomTypeNotFoundException();
-        return roomRepository.findByRoomType(roomType.get());
+        return roomRepository.findByRoomType(getRoomType.get());
     }
 
     @GetMapping("/getavailablerooms")
-    public List<Room> getAvailableRooms(@RequestBody AvailableRoomNoType availableRoom){
-        List<Room> rooms = roomRepository.findAll();
-        return returnRooms(rooms, availableRoom.getCheckInDate(),availableRoom.getCheckOutDate());
+    public List<Room> getAvailableRooms(@RequestParam(required = true) @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME) Date checkInDate,
+                                        @RequestParam(required = true) @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME) Date checkOutDate,
+                                        @RequestParam(required = false) String roomType){
+        List<Room> rooms;
+        if(roomType == null){
+            rooms = roomRepository.findAll();
+        }
+        else{
+            Optional<RoomType> getRoomType = roomTypeRepository.findByName(roomType);
+            if (!getRoomType.isPresent())
+                throw new RoomTypeNotFoundException();
+            rooms = roomRepository.findByRoomType(getRoomType.get());
+        }
+        return returnRooms(rooms, checkInDate,checkOutDate);
     }
 
-    @GetMapping("/getavailableroomsbytype")
-    public List<Room> getAvailableRoomsByType(@RequestBody AvailableRoom availableRoom) {
-        Optional<RoomType> roomType = roomTypeRepository.findByName(availableRoom.getRoomTypeName());
-        if (!roomType.isPresent())
-            throw new RoomTypeNotFoundException();
-        List<Room> rooms = roomRepository.findByRoomType(roomType.get());
-        return returnRooms(rooms, availableRoom.getCheckInDate(),availableRoom.getCheckOutDate());
+    @GetMapping("/getroomifavailable")
+    public Room getRoomIfAvailable(@RequestParam(required = true) @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME) Date checkInDate,
+                                   @RequestParam(required = true) @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME) Date checkOutDate,
+                                   @RequestParam(required = false) Integer roomNumber) {
+
+        Optional<Room> room = roomRepository.findByRoomNumber(roomNumber);
+        if(!room.isPresent())
+            throw new RoomNotFoundException();
+        List<Reservation> reservations = reservationRepository.findByRoom(room.get());
+        if(!isDateAvailable(reservations, checkInDate, checkOutDate))
+            throw new ReservationOverlapException();
+        return room.get();
     }
 
     public List<Room> returnRooms(List<Room> rooms,Date checkinDate,Date checkoutDate) {
@@ -141,6 +134,7 @@ public class HotelController {
             List<Reservation> reservations = reservationRepository.findByRoom(room);
             if(isDateAvailable(reservations, checkinDate, checkoutDate))
                 availableRooms.add(room);
+
         }
         return availableRooms;
     }
@@ -156,17 +150,17 @@ public class HotelController {
             throw new RoomNotFoundException();
         List<Reservation> reservations = reservationRepository.findByRoom(room.get());
         if(!isDateAvailable(reservations, bookRoomForCustomer.getCheckInDate(), bookRoomForCustomer.getCheckOutDate())){
-            throw new ReservationOverlapException();  
+            throw new ReservationOverlapException();
         }
-       
+
         Reservation reservation = new Reservation();
-            reservation.setCustomer(customer.get());
-            reservation.setRoom(room.get());
-            reservation.setDateCheckIn(bookRoomForCustomer.getCheckInDate());
-            reservation.setDateCheckOut(bookRoomForCustomer.getCheckOutDate());
-            reservationRepository.save(reservation);
-            return reservation;
-       
+        reservation.setCustomer(customer.get());
+        reservation.setRoom(room.get());
+        reservation.setDateCheckIn(bookRoomForCustomer.getCheckInDate());
+        reservation.setDateCheckOut(bookRoomForCustomer.getCheckOutDate());
+        reservationRepository.save(reservation);
+        return reservation;
+
     }
 
     @PostMapping("/bookroom")

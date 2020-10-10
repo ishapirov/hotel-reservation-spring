@@ -1,4 +1,4 @@
-package com.ishapirov.hotelreservation.controller.exceptions;
+package com.ishapirov.hotelapi.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

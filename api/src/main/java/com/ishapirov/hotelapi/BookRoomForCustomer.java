@@ -1,4 +1,4 @@
-package com.ishapirov.hotelreservation.controller.classes;
+package com.ishapirov.hotelapi;
 
 import java.util.Date;
 

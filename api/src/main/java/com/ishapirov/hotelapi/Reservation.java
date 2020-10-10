@@ -1,4 +1,4 @@
-package com.ishapirov.hotelreservation.hotel_objects;
+package com.ishapirov.hotelapi;
 
 import java.io.Serializable;
 
@@ -13,18 +13,17 @@ import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "reservation")
 @EqualsAndHashCode(callSuper = true)
 public class Reservation extends DatesInterval implements Serializable{
     private static final long serialVersionUID = -5960526503459035821L;
 
-    public Reservation() {
-        
-	}
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
     private Integer reservationNumber;
