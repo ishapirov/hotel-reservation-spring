@@ -1,3 +1,7 @@
+plugins{
+	id 'org.springframework.boot' version '2.3.4.RELEASE'
+}
+
 configurations {
 	compileOnly {
         extendsFrom annotationProcessor
@@ -14,7 +18,7 @@ dependencies {
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'org.postgresql:postgresql'
 
-	compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+	implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
     testCompileOnly 'org.projectlombok:lombok:1.18.14'
 	testAnnotationProcessor 'org.projectlombok:lombok:1.18.14'
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
@@ -22,7 +26,7 @@ dependencies {
 	}
 	testImplementation 'org.springframework.security:spring-security-test'
 
-	compile project(':api')
+	implementation project(':api')
 }
 
 test {

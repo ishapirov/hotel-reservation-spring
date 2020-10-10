@@ -1,3 +1,7 @@
+plugins {
+    id 'application'
+}
+
 configurations {
 	compileOnly {
         extendsFrom annotationProcessor
@@ -9,13 +13,13 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok:1.18.14'
 	testAnnotationProcessor 'org.projectlombok:lombok:1.18.14'
     implementation 'com.google.guava:guava:29.0-jre'
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.3'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.3'
     testImplementation 'io.rest-assured:rest-assured:4.3.1'
-    compile 'org.apache.commons:commons-lang3:3.11'
+    implementation 'org.apache.commons:commons-lang3:3.11'
 
     // Use JUnit test framework
     testImplementation 'junit:junit:4.13'
-    compile project(':api')
+    implementation project(':api')
 }
 
 application {

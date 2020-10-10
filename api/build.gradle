@@ -9,9 +9,9 @@ dependencies {
     implementation 'com.google.guava:guava:29.0-jre'
     compileOnly 'org.projectlombok:lombok:1.18.14'
     annotationProcessor 'org.projectlombok:lombok:1.18.14'
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.3'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.3'
     testImplementation 'io.rest-assured:rest-assured:4.3.1'
-    compile 'org.apache.commons:commons-lang3:3.11'
+    implementation 'org.apache.commons:commons-lang3:3.11'
 
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
