@@ -14,10 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 
-import com.ishapirov.hotelapi.BookRoom;
-import com.ishapirov.hotelapi.CancelReservation;
-import com.ishapirov.hotelapi.Customer;
-import com.ishapirov.hotelapi.CustomerCredentials;
+import com.ishapirov.hotelapi.*;
 import org.apache.http.HttpStatus;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -35,7 +32,7 @@ public class TokenRequiredTest extends BaseClass{
     @Test
     public void firstTestSignup() throws JsonProcessingException, URISyntaxException {
 
-        Customer testCustomer = new Customer(usernameTokenCreater.getUsername(),"123456","test@email.com","Test","User");
+        CustomerInformation testCustomer = new CustomerInformation(usernameTokenCreater.getUsername(),"123456","test@email.com","Test","User");
         ObjectMapper mapper = new ObjectMapper();
         String json = mapper.writeValueAsString(testCustomer);
 

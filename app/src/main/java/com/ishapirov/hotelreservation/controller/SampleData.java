@@ -1,13 +1,12 @@
 package com.ishapirov.hotelreservation.controller;
 
-import com.ishapirov.hotelapi.Room;
-import com.ishapirov.hotelapi.RoomType;
+import com.ishapirov.hotelreservation.hotelclasses.Room;
+import com.ishapirov.hotelreservation.hotelclasses.RoomType;
 import com.ishapirov.hotelreservation.repositories.RoomRepository;
 import com.ishapirov.hotelreservation.repositories.RoomTypeRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Controller;
 
 @Controller

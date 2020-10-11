@@ -1,4 +1,4 @@
-package com.ishapirov.hotelapi;
+package com.ishapirov.hotelreservation.hotelclasses;
 
 import java.io.Serializable;
 

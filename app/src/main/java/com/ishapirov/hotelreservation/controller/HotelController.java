@@ -1,9 +1,9 @@
 package com.ishapirov.hotelreservation.controller;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -11,11 +11,17 @@ import javax.transaction.Transactional;
 import com.ishapirov.hotelapi.*;
 import com.ishapirov.hotelapi.exceptions.*;
 
+import com.ishapirov.hotelreservation.hotelclasses.Customer;
+import com.ishapirov.hotelreservation.hotelclasses.Reservation;
+import com.ishapirov.hotelreservation.hotelclasses.Room;
+import com.ishapirov.hotelreservation.hotelclasses.RoomType;
 import com.ishapirov.hotelreservation.repositories.CustomerRepository;
 import com.ishapirov.hotelreservation.repositories.ReservationRepository;
 import com.ishapirov.hotelreservation.repositories.RoomRepository;
 import com.ishapirov.hotelreservation.repositories.RoomTypeRepository;
+import com.ishapirov.hotelreservation.util.HotelUtil;
 import com.ishapirov.hotelreservation.util.JwtUtil;
+import org.dozer.DozerBeanMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,8 +30,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -49,26 +53,33 @@ public class HotelController implements HotelAPIInterface {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    @GetMapping("/test")
+    @Autowired
+    private HotelUtil hotelUtil;
+
+    private DozerBeanMapper mapper = new DozerBeanMapper();
+
+    @Override
     public Response test() {
         return new Response("Test successful!");
     }
 
-    @GetMapping("/testToken")
+    @Override
     public String testToken() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return userDetails.getUsername() + userDetails.getAuthorities();
     }
 
+
+    @Override
     @Transactional
-    @PostMapping("/signup")
-    public Response signup(@RequestBody Customer customer) {
+    public Response signup(@RequestBody CustomerInformation customerInformation) {
+        Customer customer = new Customer(customerInformation);
         customer.setPassword(passwordEncoder.encode(customer.getPassword()));
         customerRepository.save(customer);
         return new Response("Sign in successful");
     }
 
-    @PostMapping("/authenticate")
+    @Override
     public TokenClass generateToken(@RequestBody CustomerCredentials customerCredentials) {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
@@ -79,26 +90,41 @@ public class HotelController implements HotelAPIInterface {
         return new TokenClass(jwtUtil.generateToken(customerCredentials.getUsername()));
     }
 
-    @GetMapping("/getroom")
-    public Room getRoom(@RequestParam(required = true) Integer roomNumber) {
-        Optional<Room> room = roomRepository.findByRoomNumber(roomNumber);
-        if(!room.isPresent())
+    @Override
+    public RoomInformation getRoom(@RequestParam(required = true) Integer roomNumber) {
+        Optional<Room> getRoom = roomRepository.findByRoomNumber(roomNumber);
+        if(getRoom.isEmpty())
             throw new RoomNotFoundException();
-        return room.get();
+        Room room = getRoom.get();
+        RoomInformation roomInformation = new RoomInformation();
+        roomInformation.setRoomNumber(room.getRoomNumber());
+        if(roomInformation.getRoomPrice() == null)
+            roomInformation.setRoomPrice(room.getRoomType().getDefaultPrice());
+        else
+            roomInformation.setRoomPrice(room.getRoomPrice());
+        roomInformation.setRoomType(room.getRoomType().getName());
+        return roomInformation;
     }
 
-    @GetMapping("/getallrooms")
-    public List<Room> getRoomsByType(@RequestParam(required = false) String roomType) {
+    @Override
+    public List<RoomInformation> getRoomsByType(@RequestParam(required = false) String roomType) {
         if(roomType == null)
-            return roomRepository.findAll();
+            return roomRepository
+                    .findAll()
+                    .stream()
+                    .map(room -> new RoomInformation(
+                            room.getRoomNumber(),
+                            room.getRoomType().getName(),
+                            room.getRoomPrice()
+            )).collect(Collectors.toList());
         Optional<RoomType> getRoomType = roomTypeRepository.findByName(roomType);
-        if (!getRoomType.isPresent())
+        if (getRoomType.isEmpty())
             throw new RoomTypeNotFoundException();
-        return roomRepository.findByRoomType(getRoomType.get());
+        return roomRepository.findByRoomType(getRoomType.get()).stream().map(room -> new RoomInformation(room)).collect(Collectors.toList());
     }
 
-    @GetMapping("/getavailablerooms")
-    public List<Room> getAvailableRooms(@RequestParam(required = true) @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME) Date checkInDate,
+    @Override
+    public List<RoomInformation> getAvailableRooms(@RequestParam(required = true) @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME) Date checkInDate,
                                         @RequestParam(required = true) @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME) Date checkOutDate,
                                         @RequestParam(required = false) String roomType){
         List<Room> rooms;
@@ -107,49 +133,39 @@ public class HotelController implements HotelAPIInterface {
         }
         else{
             Optional<RoomType> getRoomType = roomTypeRepository.findByName(roomType);
-            if (!getRoomType.isPresent())
+            if (getRoomType.isEmpty())
                 throw new RoomTypeNotFoundException();
             rooms = roomRepository.findByRoomType(getRoomType.get());
         }
-        return returnRooms(rooms, checkInDate,checkOutDate);
+        return hotelUtil.returnRooms(rooms, checkInDate,checkOutDate).stream().map(room -> new RoomInformation(room)).collect(Collectors.toList());
     }
 
-    @GetMapping("/getroomifavailable")
-    public Room getRoomIfAvailable(@RequestParam(required = true) @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME) Date checkInDate,
+    @Override
+    public RoomInformation getRoomIfAvailable(@RequestParam(required = true) @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME) Date checkInDate,
                                    @RequestParam(required = true) @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME) Date checkOutDate,
                                    @RequestParam(required = false) Integer roomNumber) {
 
         Optional<Room> room = roomRepository.findByRoomNumber(roomNumber);
-        if(!room.isPresent())
+        if(room.isEmpty())
             throw new RoomNotFoundException();
         List<Reservation> reservations = reservationRepository.findByRoom(room.get());
-        if(!isDateAvailable(reservations, checkInDate, checkOutDate))
+        if(!hotelUtil.isDateAvailable(reservations, checkInDate, checkOutDate))
             throw new ReservationOverlapException();
-        return room.get();
+        return new RoomInformation(room.get());
     }
 
-    public List<Room> returnRooms(List<Room> rooms,Date checkinDate,Date checkoutDate) {
-        List<Room> availableRooms = new ArrayList<>();
-        for (Room room : rooms){
-            List<Reservation> reservations = reservationRepository.findByRoom(room);
-            if(isDateAvailable(reservations, checkinDate, checkoutDate))
-                availableRooms.add(room);
 
-        }
-        return availableRooms;
-    }
-
+    @Override
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @PostMapping("/bookRoomForCustomer")
-    public Reservation bookRoomForCustomer(@RequestBody BookRoomForCustomer bookRoomForCustomer) {
+    public ReservationInformation bookRoomForCustomer(@RequestBody BookRoomForCustomer bookRoomForCustomer) {
         Optional<Customer> customer = customerRepository.findByUsername(bookRoomForCustomer.getUsername());
         Optional<Room> room = roomRepository.findByRoomNumber(bookRoomForCustomer.getRoomNumber());
-        if(!customer.isPresent())
+        if(customer.isEmpty())
             throw new CustomerNotFoundException();
-        if(!room.isPresent())
+        if(room.isEmpty())
             throw new RoomNotFoundException();
         List<Reservation> reservations = reservationRepository.findByRoom(room.get());
-        if(!isDateAvailable(reservations, bookRoomForCustomer.getCheckInDate(), bookRoomForCustomer.getCheckOutDate())){
+        if(!hotelUtil.isDateAvailable(reservations, bookRoomForCustomer.getCheckInDate(), bookRoomForCustomer.getCheckOutDate())){
             throw new ReservationOverlapException();
         }
 
@@ -159,40 +175,33 @@ public class HotelController implements HotelAPIInterface {
         reservation.setDateCheckIn(bookRoomForCustomer.getCheckInDate());
         reservation.setDateCheckOut(bookRoomForCustomer.getCheckOutDate());
         reservationRepository.save(reservation);
-        return reservation;
+        return new ReservationInformation(reservation);
 
     }
 
-    @PostMapping("/bookroom")
-    public Reservation bookRoom(@RequestBody BookRoom bookRoom) {
+    @Override
+    public ReservationInformation bookRoom(@RequestBody BookRoom bookRoom) {
         UserDetails userDetails = (UserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String username = userDetails.getUsername();
         BookRoomForCustomer bookRoomForCustomer = new BookRoomForCustomer(username,bookRoom);
         return bookRoomForCustomer(bookRoomForCustomer);
     }
 
-    private boolean isDateAvailable(List<Reservation> reservations,Date checkin, Date checkout){
-        for(Reservation reservation: reservations){
-            if(!reservation.isAvailable(checkin, checkout)){
-                return false;
-            }
-        }
-        return true;
-    }
 
-    @PostMapping("/cancelreservation")
+
+    @Override
     @Transactional
     public Response cancelRoom(@RequestBody CancelReservation cancelReservation){
         Optional<Reservation> reservation = reservationRepository.findByReservationNumber(cancelReservation.getReservationNumber());
-        if(!reservation.isPresent())
+        if(reservation.isEmpty())
             return new Response("Reservation not found");
         if(reservationRepository.deleteByReservationNumber(cancelReservation.getReservationNumber()) != 1)
             return new Response("An error occured cancelling the reservation");
         return new Response("Reservation successfully cancelled");
     }
 
-    @GetMapping("/viewreservation")
-    public Reservation viewReservation(@RequestParam(required = true) Integer reservationNumber) {
+    @Override
+    public ReservationInformation viewReservation(@RequestParam(required = true) Integer reservationNumber) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Reservation> reservation = reservationRepository.findByReservationNumber(reservationNumber);
         if(!reservation.isPresent())
@@ -200,7 +209,7 @@ public class HotelController implements HotelAPIInterface {
         Reservation userReservation = reservation.get();
         if(!userDetails.getUsername().equals(userReservation.getCustomer().getUsername()))
             throw new ReservationUsernamesDoNotMatchException();
-        return userReservation;
+        return new ReservationInformation(userReservation);
     }
 
 }

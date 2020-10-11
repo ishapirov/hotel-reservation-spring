@@ -1,4 +1,4 @@
-package com.ishapirov.hotelapi;
+package com.ishapirov.hotelreservation.hotelclasses;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,14 +10,14 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "room")
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
+@Data
 public class Room {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -30,10 +30,5 @@ public class Room {
 
 	private double roomPrice;
 
-	public Room(int roomNumber, RoomType typeOfRoom, double roomPrice){
-		this.roomNumber = roomNumber;
-		this.roomType = typeOfRoom;
-		this.roomPrice = roomPrice;	
-	}
 
 }

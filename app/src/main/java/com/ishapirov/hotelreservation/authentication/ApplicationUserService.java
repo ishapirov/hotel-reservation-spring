@@ -2,7 +2,7 @@ package com.ishapirov.hotelreservation.authentication;
 
 import java.util.Optional;
 
-import com.ishapirov.hotelapi.Customer;
+import com.ishapirov.hotelreservation.hotelclasses.Customer;
 import com.ishapirov.hotelreservation.repositories.CustomerRepository;
 import com.ishapirov.hotelreservation.security.SecurityUser;
 

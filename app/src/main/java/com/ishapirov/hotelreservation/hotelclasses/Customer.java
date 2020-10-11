@@ -1,4 +1,4 @@
-package com.ishapirov.hotelapi;
+package com.ishapirov.hotelreservation.hotelclasses;
 
 import java.io.Serializable;
 
@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.ishapirov.hotelapi.CustomerInformation;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,11 +32,11 @@ public class Customer implements Serializable{
 	private String firstName;
 	private String lastName;
 
-	public Customer(String username, String password, String email, String firstName, String lastName) {
-		this.username = username;
-		this.password = password;
-		this.email = email;
-		this.firstName = firstName;
-		this.lastName = lastName;
+	public Customer(CustomerInformation customerInformation) {
+		this.username = customerInformation.getUsername();
+		this.password = customerInformation.getPassword();
+		this.email = customerInformation.getEmail();
+		this.firstName = customerInformation.getFirstName();
+		this.lastName = customerInformation.getLastName();
 	}
 }
