@@ -11,14 +11,14 @@ import lombok.Data;
 @MappedSuperclass
 public abstract class DatesInterval {
     @Column(name = "checkin")
-    private Date dateCheckIn;
+    private Date checkInDate;
     @Column(name = "checkout")
-    private Date dateCheckOut;
+    private Date checkOutDate;
 
     public boolean isAvailable(Date otherDateCheckIn, Date otherDateCheckOut) {
-        if((this.dateCheckIn.compareTo(otherDateCheckIn) >= 0 && this.dateCheckIn.compareTo(otherDateCheckOut) < 0) 
-            || (this.dateCheckOut.compareTo(otherDateCheckIn) > 0 && this.dateCheckOut.compareTo(otherDateCheckOut) <= 0) 
-            || (this.dateCheckIn.compareTo(otherDateCheckIn) <= 0 && this.dateCheckOut.compareTo(otherDateCheckOut) >= 0)){
+        if((this.checkInDate.compareTo(otherDateCheckIn) >= 0 && this.checkInDate.compareTo(otherDateCheckOut) < 0)
+            || (this.checkOutDate.compareTo(otherDateCheckIn) > 0 && this.checkOutDate.compareTo(otherDateCheckOut) <= 0)
+            || (this.checkInDate.compareTo(otherDateCheckIn) <= 0 && this.checkOutDate.compareTo(otherDateCheckOut) >= 0)){
             return false;
         }
         return true;

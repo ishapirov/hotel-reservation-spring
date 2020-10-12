@@ -3,8 +3,10 @@ package com.ishapirov.hotelapi;
 import java.util.Date;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class BookRoomForCustomer {
 	private String username;
     private Integer roomNumber;

@@ -7,7 +7,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CustomerCredentials {
+public class CustomerSignupInformation {
     private String username;
     private String password;
+    private String email;
+    private String firstName;
+    private String lastName;
 }

@@ -7,6 +7,7 @@ import com.ishapirov.hotelreservation.repositories.RoomTypeRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -16,7 +17,7 @@ public class SampleData {
     @Autowired
     private RoomTypeRepository roomTypeRepository;
 
-    // @EventListener
+    //@EventListener
     public void appReady(ApplicationReadyEvent event){
         RoomType singleType = new RoomType("Single",180.00);
         RoomType doubleType = new RoomType("Double",220.00);
@@ -29,19 +30,19 @@ public class SampleData {
 
         //Creating 100 rooms (25 of each type for now)
         for(int i=0;i<25;i++){
-            Room room = new Room(i,singleType,Math.round((Math.random()*100+120)*100)/100);
+            Room room = new Room(i,singleType, (double) (Math.round((Math.random()*100+120)*100)/100));
             roomRepository.save(room);
         }
         for(int i=25;i<50;i++){
-            Room room = new Room(i,doubleType,Math.round((Math.random()*120+180)*100)/100);
+            Room room = new Room(i,doubleType, (double) (Math.round((Math.random()*120+180)*100)/100));
             roomRepository.save(room);
         }
         for(int i=50;i<75;i++){
-            Room room = new Room(i,suiteType,Math.round((Math.random()*200+350)*100)/100);
+            Room room = new Room(i,suiteType, (double) (Math.round((Math.random()*200+350)*100)/100));
             roomRepository.save(room);
         }
         for(int i=75;i<100;i++){
-            Room room = new Room(i,penthouseType,Math.round((Math.random()*400+600)*100)/100);
+            Room room = new Room(i,penthouseType, (double) (Math.round((Math.random()*400+600)*100)/100));
             roomRepository.save(room);
         }
     }

@@ -17,7 +17,7 @@ public interface HotelAPIInterface {
     String testToken();
 
     @PostMapping("/signup")
-    Response signup(@RequestBody CustomerInformation customer);
+    Response signup(@RequestBody CustomerSignupInformation customer);
 
     @PostMapping("/authenticate")
     TokenClass generateToken(@RequestBody CustomerCredentials customerCredentials);

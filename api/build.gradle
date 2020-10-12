@@ -1,7 +1,14 @@
+plugins {
+    id 'java'
+}
 configurations {
 	compileOnly {
         extendsFrom annotationProcessor
 	}
+}
+
+repositories {
+    jcenter()
 }
 
 dependencies {

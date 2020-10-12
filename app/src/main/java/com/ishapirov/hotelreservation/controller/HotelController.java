@@ -3,7 +3,6 @@ package com.ishapirov.hotelreservation.controller;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -19,19 +18,16 @@ import com.ishapirov.hotelreservation.repositories.CustomerRepository;
 import com.ishapirov.hotelreservation.repositories.ReservationRepository;
 import com.ishapirov.hotelreservation.repositories.RoomRepository;
 import com.ishapirov.hotelreservation.repositories.RoomTypeRepository;
+import com.ishapirov.hotelreservation.util.DomainToApiMapper;
 import com.ishapirov.hotelreservation.util.HotelUtil;
 import com.ishapirov.hotelreservation.util.JwtUtil;
-import org.dozer.DozerBeanMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -56,7 +52,8 @@ public class HotelController implements HotelAPIInterface {
     @Autowired
     private HotelUtil hotelUtil;
 
-    private DozerBeanMapper mapper = new DozerBeanMapper();
+    @Autowired
+    private DomainToApiMapper domainToApiMapper;
 
     @Override
     public Response test() {
@@ -72,15 +69,15 @@ public class HotelController implements HotelAPIInterface {
 
     @Override
     @Transactional
-    public Response signup(@RequestBody CustomerInformation customerInformation) {
-        Customer customer = new Customer(customerInformation);
+    public Response signup(CustomerSignupInformation customerSignupInformation) {
+        Customer customer = new Customer(customerSignupInformation);
         customer.setPassword(passwordEncoder.encode(customer.getPassword()));
         customerRepository.save(customer);
         return new Response("Sign in successful");
     }
 
     @Override
-    public TokenClass generateToken(@RequestBody CustomerCredentials customerCredentials) {
+    public TokenClass generateToken(CustomerCredentials customerCredentials) {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     customerCredentials.getUsername(), customerCredentials.getPassword()));
@@ -91,42 +88,29 @@ public class HotelController implements HotelAPIInterface {
     }
 
     @Override
-    public RoomInformation getRoom(@RequestParam(required = true) Integer roomNumber) {
+    public RoomInformation getRoom(Integer roomNumber) {
         Optional<Room> getRoom = roomRepository.findByRoomNumber(roomNumber);
         if(getRoom.isEmpty())
             throw new RoomNotFoundException();
-        Room room = getRoom.get();
-        RoomInformation roomInformation = new RoomInformation();
-        roomInformation.setRoomNumber(room.getRoomNumber());
-        if(roomInformation.getRoomPrice() == null)
-            roomInformation.setRoomPrice(room.getRoomType().getDefaultPrice());
-        else
-            roomInformation.setRoomPrice(room.getRoomPrice());
-        roomInformation.setRoomType(room.getRoomType().getName());
-        return roomInformation;
+        return domainToApiMapper.getRoomInformation(getRoom.get());
     }
 
     @Override
-    public List<RoomInformation> getRoomsByType(@RequestParam(required = false) String roomType) {
+    public List<RoomInformation> getRoomsByType(String roomType) {
+        List<Room> rooms;
         if(roomType == null)
-            return roomRepository
-                    .findAll()
-                    .stream()
-                    .map(room -> new RoomInformation(
-                            room.getRoomNumber(),
-                            room.getRoomType().getName(),
-                            room.getRoomPrice()
-            )).collect(Collectors.toList());
-        Optional<RoomType> getRoomType = roomTypeRepository.findByName(roomType);
-        if (getRoomType.isEmpty())
-            throw new RoomTypeNotFoundException();
-        return roomRepository.findByRoomType(getRoomType.get()).stream().map(room -> new RoomInformation(room)).collect(Collectors.toList());
+            rooms = roomRepository.findAll();
+        else {
+            Optional<RoomType> getRoomType = roomTypeRepository.findByName(roomType);
+            if (getRoomType.isEmpty())
+                throw new RoomTypeNotFoundException();
+            rooms = roomRepository.findByRoomType(getRoomType.get());
+        }
+        return domainToApiMapper.getRoomsInformation(rooms);
     }
 
     @Override
-    public List<RoomInformation> getAvailableRooms(@RequestParam(required = true) @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME) Date checkInDate,
-                                        @RequestParam(required = true) @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME) Date checkOutDate,
-                                        @RequestParam(required = false) String roomType){
+    public List<RoomInformation> getAvailableRooms(Date checkInDate,Date checkOutDate, String roomType){
         List<Room> rooms;
         if(roomType == null){
             rooms = roomRepository.findAll();
@@ -137,27 +121,26 @@ public class HotelController implements HotelAPIInterface {
                 throw new RoomTypeNotFoundException();
             rooms = roomRepository.findByRoomType(getRoomType.get());
         }
-        return hotelUtil.returnRooms(rooms, checkInDate,checkOutDate).stream().map(room -> new RoomInformation(room)).collect(Collectors.toList());
+        rooms = hotelUtil.returnRooms(rooms, checkInDate,checkOutDate);
+        return domainToApiMapper.getRoomsInformation(rooms);
     }
 
     @Override
-    public RoomInformation getRoomIfAvailable(@RequestParam(required = true) @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME) Date checkInDate,
-                                   @RequestParam(required = true) @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME) Date checkOutDate,
-                                   @RequestParam(required = false) Integer roomNumber) {
+    public RoomInformation getRoomIfAvailable(Date checkInDate, Date checkOutDate, Integer roomNumber) {
 
-        Optional<Room> room = roomRepository.findByRoomNumber(roomNumber);
-        if(room.isEmpty())
+        Optional<Room> getRoom = roomRepository.findByRoomNumber(roomNumber);
+        if(getRoom.isEmpty())
             throw new RoomNotFoundException();
-        List<Reservation> reservations = reservationRepository.findByRoom(room.get());
+        List<Reservation> reservations = reservationRepository.findByRoom(getRoom.get());
         if(!hotelUtil.isDateAvailable(reservations, checkInDate, checkOutDate))
             throw new ReservationOverlapException();
-        return new RoomInformation(room.get());
+        return domainToApiMapper.getRoomInformation(getRoom.get());
     }
 
 
     @Override
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ReservationInformation bookRoomForCustomer(@RequestBody BookRoomForCustomer bookRoomForCustomer) {
+    public ReservationInformation bookRoomForCustomer(BookRoomForCustomer bookRoomForCustomer) {
         Optional<Customer> customer = customerRepository.findByUsername(bookRoomForCustomer.getUsername());
         Optional<Room> room = roomRepository.findByRoomNumber(bookRoomForCustomer.getRoomNumber());
         if(customer.isEmpty())
@@ -172,36 +155,34 @@ public class HotelController implements HotelAPIInterface {
         Reservation reservation = new Reservation();
         reservation.setCustomer(customer.get());
         reservation.setRoom(room.get());
-        reservation.setDateCheckIn(bookRoomForCustomer.getCheckInDate());
-        reservation.setDateCheckOut(bookRoomForCustomer.getCheckOutDate());
+        reservation.setCheckInDate(bookRoomForCustomer.getCheckInDate());
+        reservation.setCheckOutDate(bookRoomForCustomer.getCheckOutDate());
         reservationRepository.save(reservation);
-        return new ReservationInformation(reservation);
+        return domainToApiMapper.getReservationInformation(reservation);
 
     }
 
     @Override
-    public ReservationInformation bookRoom(@RequestBody BookRoom bookRoom) {
+    public ReservationInformation bookRoom(BookRoom bookRoom) {
         UserDetails userDetails = (UserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String username = userDetails.getUsername();
         BookRoomForCustomer bookRoomForCustomer = new BookRoomForCustomer(username,bookRoom);
         return bookRoomForCustomer(bookRoomForCustomer);
     }
 
-
-
     @Override
     @Transactional
-    public Response cancelRoom(@RequestBody CancelReservation cancelReservation){
+    public Response cancelRoom(CancelReservation cancelReservation){
         Optional<Reservation> reservation = reservationRepository.findByReservationNumber(cancelReservation.getReservationNumber());
         if(reservation.isEmpty())
             return new Response("Reservation not found");
         if(reservationRepository.deleteByReservationNumber(cancelReservation.getReservationNumber()) != 1)
-            return new Response("An error occured cancelling the reservation");
+            return new Response("An error occurred cancelling the reservation");
         return new Response("Reservation successfully cancelled");
     }
 
     @Override
-    public ReservationInformation viewReservation(@RequestParam(required = true) Integer reservationNumber) {
+    public ReservationInformation viewReservation(Integer reservationNumber) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Reservation> reservation = reservationRepository.findByReservationNumber(reservationNumber);
         if(!reservation.isPresent())
@@ -209,7 +190,7 @@ public class HotelController implements HotelAPIInterface {
         Reservation userReservation = reservation.get();
         if(!userDetails.getUsername().equals(userReservation.getCustomer().getUsername()))
             throw new ReservationUsernamesDoNotMatchException();
-        return new ReservationInformation(userReservation);
+        return domainToApiMapper.getReservationInformation(userReservation);
     }
 
 }

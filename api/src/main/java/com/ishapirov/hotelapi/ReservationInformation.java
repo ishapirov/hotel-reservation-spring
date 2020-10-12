@@ -4,14 +4,17 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class ReservationInformation {
 
     private Integer reservationNumber;
-    private String customerFirstName;
-    private String customerLastName;
+    private CustomerInformation customerInformation;
     private RoomInformation roomInformation;
+    private Date checkInDate;
+    private Date checkOutDate;
 
 }

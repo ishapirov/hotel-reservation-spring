@@ -69,8 +69,8 @@ public class ApiTest extends BaseClass {
 
     @Test
     public void testAvailableRoomsNoType() throws URISyntaxException, JsonProcessingException {
-        String d1 ="2020-10-10T17:24:56.081Z";
-        String d2 ="2020-10-11T17:24:56.081Z";
+        String d1 ="2010-10-10T17:24:56.081Z";
+        String d2 ="2010-10-11T17:24:56.081Z";
 
         given().contentType(ContentType.JSON)
         .param("checkInDate",d1)
@@ -85,8 +85,8 @@ public class ApiTest extends BaseClass {
     @Test
     public void testAvailableRoomsByType() throws URISyntaxException, JsonProcessingException {
         String type = "Single";
-        String d1 ="2020-10-10T17:24:56.081Z";
-        String d2 ="2020-10-11T17:24:56.081Z";
+        String d1 ="2010-10-10T17:24:56.081Z";
+        String d2 ="2010-10-11T17:24:56.081Z";
 
         given().contentType(ContentType.JSON)
         .param("checkInDate",d1)
@@ -95,7 +95,7 @@ public class ApiTest extends BaseClass {
         .accept(ContentType.JSON)
         .when().get(new URI("/getavailablerooms")).then().assertThat()
         .statusCode(HttpStatus.SC_OK)
-        .body("size()",equalTo(24),"get(0).roomNumber",equalTo(754),"get(1).roomNumber",equalTo(756));
+        .body("size()",equalTo(25),"get(0).roomNumber",equalTo(754),"get(1).roomNumber",equalTo(756));
     }
     
 }

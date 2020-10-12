@@ -28,7 +28,14 @@ public class Room {
 	@JoinColumn(name="room_type")
 	private RoomType roomType;
 
-	private double roomPrice;
+	private Double roomPrice;
+
+	public Double getPrice(){
+		if(this.roomPrice == null){
+			return roomType.getDefaultPrice();
+		}
+		return roomPrice;
+	}
 
 
 }

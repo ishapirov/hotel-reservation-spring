@@ -9,7 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import com.ishapirov.hotelapi.CustomerInformation;
+import com.ishapirov.hotelapi.CustomerSignupInformation;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -32,11 +32,11 @@ public class Customer implements Serializable{
 	private String firstName;
 	private String lastName;
 
-	public Customer(CustomerInformation customerInformation) {
-		this.username = customerInformation.getUsername();
-		this.password = customerInformation.getPassword();
-		this.email = customerInformation.getEmail();
-		this.firstName = customerInformation.getFirstName();
-		this.lastName = customerInformation.getLastName();
+	public Customer(CustomerSignupInformation customerSignupInformation) {
+		this.username = customerSignupInformation.getUsername();
+		this.password = customerSignupInformation.getPassword();
+		this.email = customerSignupInformation.getEmail();
+		this.firstName = customerSignupInformation.getFirstName();
+		this.lastName = customerSignupInformation.getLastName();
 	}
 }

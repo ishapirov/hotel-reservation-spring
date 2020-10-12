@@ -32,7 +32,7 @@ public class TokenRequiredTest extends BaseClass{
     @Test
     public void firstTestSignup() throws JsonProcessingException, URISyntaxException {
 
-        CustomerInformation testCustomer = new CustomerInformation(usernameTokenCreater.getUsername(),"123456","test@email.com","Test","User");
+        CustomerSignupInformation testCustomer = new CustomerSignupInformation(usernameTokenCreater.getUsername(),"123456","test@email.com","Test","User");
         ObjectMapper mapper = new ObjectMapper();
         String json = mapper.writeValueAsString(testCustomer);
 
@@ -102,8 +102,8 @@ public class TokenRequiredTest extends BaseClass{
         headers.put("Authorization",token);
 
         Integer roomNumber = 853;
-        Date d1 = DateFormat.getDateInstance().parse( "2020-10-10T17:24:56.081Z");
-        Date d2 = DateFormat.getDateInstance().parse( "2020-10-10T17:24:56.081Z");
+        Date d1 = DateFormat.getDateInstance().parse( "2010-10-10T17:24:56.081Z");
+        Date d2 = DateFormat.getDateInstance().parse( "2010-10-10T17:24:56.081Z");
 
         BookRoom bookRoom = new BookRoom(roomNumber,d1,d2);
         ObjectMapper mapper = new ObjectMapper();
@@ -131,8 +131,8 @@ public class TokenRequiredTest extends BaseClass{
         .body("customer.username",equalTo(usernameTokenCreater.getUsername()));
         //Testing availability of room at different time intervals
         //Checkin: Prior to start. Checkout: Inside interval. Should be unavailable
-        d1 = DateFormat.getDateInstance().parse( "2020-10-9T17:24:56.081Z");
-        d2 = DateFormat.getDateInstance().parse( "2020-10-13T17:24:56.081Z");
+        d1 = DateFormat.getDateInstance().parse( "2010-10-9T17:24:56.081Z");
+        d2 = DateFormat.getDateInstance().parse( "2010-10-13T17:24:56.081Z");
 
         given().contentType(ContentType.JSON)
         .param("checkInDate",d1)
@@ -143,8 +143,8 @@ public class TokenRequiredTest extends BaseClass{
         .statusCode(HttpStatus.SC_CONFLICT);
 
         //Checkin: Inside interval. Checkout: Outside interval. Should be unavailable
-        d1 = DateFormat.getDateInstance().parse( "2020-10-12T17:24:56.081Z");
-        d2 = DateFormat.getDateInstance().parse( "2020-10-16T17:24:56.081Z");
+        d1 = DateFormat.getDateInstance().parse( "2010-10-12T17:24:56.081Z");
+        d2 = DateFormat.getDateInstance().parse( "2010-10-16T17:24:56.081Z");
 
 
         given().contentType(ContentType.JSON)
@@ -157,8 +157,8 @@ public class TokenRequiredTest extends BaseClass{
 
         //Testing availability of room at different time intervals
         //Checkin: Outside interval. Checkout: Outside interval. Should be unavailable
-        d1 = DateFormat.getDateInstance().parse( "2020-10-9T17:24:56.081Z");
-        d2 = DateFormat.getDateInstance().parse( "2020-10-16T17:24:56.081Z");
+        d1 = DateFormat.getDateInstance().parse( "2010-10-9T17:24:56.081Z");
+        d2 = DateFormat.getDateInstance().parse( "2010-10-16T17:24:56.081Z");
 
 
         given().contentType(ContentType.JSON)
