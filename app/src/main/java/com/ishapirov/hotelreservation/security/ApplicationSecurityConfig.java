@@ -29,7 +29,7 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
     public ApplicationSecurityConfig(PasswordEncoder passwordEncoder, ApplicationUserService applicationUserService) {
         this.passwordEncoder = passwordEncoder;
         this.applicationUserService = applicationUserService;
-    }   
+    }
 
     @Autowired
     private JwtFilter filter;
@@ -38,12 +38,12 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().disable();
         http.csrf().disable()
-            .authorizeRequests().antMatchers("/getroom","/test","/signup","/authenticate","/getallrooms","/getroomsbytype","/getavailableroomsbytype","/getavailablerooms")
-            .permitAll()
-            .antMatchers(HttpMethod.OPTIONS,"/**").permitAll()
-            .anyRequest().authenticated()
-            .and().exceptionHandling()
-            .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .authorizeRequests().antMatchers("/getroom","/test","/signup","/authenticate","/getallrooms","/getroomsbytype","/getavailableroomsbytype","/getavailablerooms","/getroomifavailable")
+                .permitAll()
+                .antMatchers(HttpMethod.OPTIONS,"/**").permitAll()
+                .anyRequest().authenticated()
+                .and().exceptionHandling()
+                .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
     }
 
@@ -52,7 +52,7 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authenticationManagerBean() throws Exception{
         return super.authenticationManagerBean();
     }
-    
+
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -67,5 +67,5 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
         return provider;
     }
 
-   
+
 }

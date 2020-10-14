@@ -2,7 +2,7 @@ package com.ishapirov.hotelreservation.repositories;
 
 import java.util.Optional;
 
-import com.ishapirov.hotelreservation.hotel_objects.RoomType;
+import com.ishapirov.hotelreservation.hotelclasses.RoomType;
 
 import org.springframework.data.repository.CrudRepository;
 
