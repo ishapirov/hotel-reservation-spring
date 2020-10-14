@@ -1,16 +1,15 @@
-package com.ishapirov.hotelapi;
-
+package com.ishapirov.hotelapi.formdata;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RoomInformation {
-
+public class BookRoom {
     private Integer roomNumber;
-    private RoomTypeInformation roomType;
-    private Double roomPrice;
-
+    private Date checkInDate;
+    private Date checkOutDate;
 }

@@ -1,9 +1,9 @@
 package com.ishapirov.hotelreservation.util;
 
-import com.ishapirov.hotelapi.CustomerInformation;
-import com.ishapirov.hotelapi.ReservationInformation;
-import com.ishapirov.hotelapi.RoomInformation;
-import com.ishapirov.hotelapi.RoomTypeInformation;
+import com.ishapirov.hotelapi.domainapi.CustomerInformation;
+import com.ishapirov.hotelapi.domainapi.ReservationInformation;
+import com.ishapirov.hotelapi.domainapi.RoomInformation;
+import com.ishapirov.hotelapi.domainapi.RoomTypeInformation;
 import com.ishapirov.hotelreservation.hotelclasses.Customer;
 import com.ishapirov.hotelreservation.hotelclasses.Reservation;
 import com.ishapirov.hotelreservation.hotelclasses.Room;

@@ -1,6 +1,7 @@
 package hotel.reservation.apitesting;
 
 import static io.restassured.RestAssured.*;
+
 import org.junit.BeforeClass;
 
 
@@ -13,6 +14,5 @@ public class BaseClass {
         basePath = "";
     }
 
-   
    
 }

@@ -2,11 +2,19 @@ package com.ishapirov.hotelapi;
 
 import java.util.Date;
 import java.util.List;
+
+import com.ishapirov.hotelapi.cancel.CancelReservation;
+import com.ishapirov.hotelapi.domainapi.CustomerInformation;
+import com.ishapirov.hotelapi.domainapi.ReservationInformation;
+import com.ishapirov.hotelapi.domainapi.RoomInformation;
+import com.ishapirov.hotelapi.formdata.BookRoom;
+import com.ishapirov.hotelapi.formdata.adminreq.BookRoomForCustomer;
+import com.ishapirov.hotelapi.formdata.CustomerCredentials;
+import com.ishapirov.hotelapi.formdata.CustomerSignupInformation;
+import com.ishapirov.hotelapi.token.TokenClass;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 public interface HotelAPIInterface {
 
@@ -17,10 +25,13 @@ public interface HotelAPIInterface {
     String testToken();
 
     @PostMapping("/signup")
-    Response signup(@RequestBody CustomerSignupInformation customer);
+    CustomerInformation signup(@RequestBody CustomerSignupInformation customer);
 
     @PostMapping("/authenticate")
     TokenClass generateToken(@RequestBody CustomerCredentials customerCredentials);
+
+    @GetMapping("/getcustomer")
+    CustomerInformation getCustomer(@RequestParam String username);
 
     @GetMapping("/getroom")
     RoomInformation getRoom(@RequestParam(required = true) Integer roomNumber);
@@ -48,7 +59,8 @@ public interface HotelAPIInterface {
     ReservationInformation bookRoom(@RequestBody BookRoom bookRoom);
 
     @PostMapping("/cancelreservation")
-    Response cancelRoom(@RequestBody CancelReservation cancelReservation);
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void cancelRoom(@RequestBody CancelReservation cancelReservation);
 
     @GetMapping("/viewreservation")
     ReservationInformation viewReservation(@RequestParam(required = true) Integer reservationNumber);

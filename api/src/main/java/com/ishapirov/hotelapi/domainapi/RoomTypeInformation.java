@@ -1,4 +1,4 @@
-package com.ishapirov.hotelapi;
+package com.ishapirov.hotelapi.domainapi;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CancelReservation {
-    private Integer reservationNumber;
+public class RoomTypeInformation {
+    private String name;
 }

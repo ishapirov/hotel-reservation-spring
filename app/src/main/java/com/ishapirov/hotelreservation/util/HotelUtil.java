@@ -1,5 +1,6 @@
 package com.ishapirov.hotelreservation.util;
 
+import com.ishapirov.hotelapi.exceptions.DatesInvalidException;
 import com.ishapirov.hotelreservation.hotelclasses.Reservation;
 import com.ishapirov.hotelreservation.hotelclasses.Room;
 import com.ishapirov.hotelreservation.repositories.ReservationRepository;
@@ -15,11 +16,11 @@ public class HotelUtil {
     @Autowired
     ReservationRepository reservationRepository;
 
-    public List<Room> returnRooms(List<Room> rooms, Date checkinDate, Date checkoutDate) {
+    public List<Room> returnRooms(List<Room> rooms, Date checkInDate, Date checkOutDate) {
         List<Room> availableRooms = new ArrayList<>();
         for (Room room : rooms){
             List<Reservation> reservations = reservationRepository.findByRoom(room);
-            if(isDateAvailable(reservations, checkinDate, checkoutDate))
+            if(isDateAvailable(reservations, checkInDate, checkOutDate))
                 availableRooms.add(room);
 
         }
@@ -33,6 +34,13 @@ public class HotelUtil {
             }
         }
         return true;
+    }
+
+    public void validateDates(Date checkInDate,Date checkOutDate){
+        if(checkInDate.compareTo(new Date())<0)
+            throw new DatesInvalidException("The check in date has been set for a date in the past");
+        if(checkOutDate.compareTo(checkInDate)<0)
+            throw new DatesInvalidException("The check out date is before the check in date");
     }
 
 }

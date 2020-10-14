@@ -1,7 +1,8 @@
-package com.ishapirov.hotelapi;
+package com.ishapirov.hotelapi.formdata.adminreq;
 
 import java.util.Date;
 
+import com.ishapirov.hotelapi.formdata.BookRoom;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

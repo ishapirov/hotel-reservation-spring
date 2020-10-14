@@ -1,4 +1,4 @@
-package com.ishapirov.hotelapi;
+package com.ishapirov.hotelapi.token;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
