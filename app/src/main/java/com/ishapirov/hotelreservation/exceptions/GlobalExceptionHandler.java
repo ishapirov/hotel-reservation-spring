@@ -1,6 +1,11 @@
 package com.ishapirov.hotelreservation.exceptions;
 
-import com.ishapirov.hotelapi.exceptions.*;
+import com.ishapirov.hotelapi.authenticationservice.exceptions.InvalidUsernameOrPasswordException;
+import com.ishapirov.hotelapi.generalexceptions.*;
+import com.ishapirov.hotelapi.reservationservice.exceptions.*;
+import com.ishapirov.hotelapi.roomservice.exceptions.RoomNotFoundException;
+import com.ishapirov.hotelapi.roomservice.exceptions.RoomTypeNotFoundException;
+import com.ishapirov.hotelapi.userservice.exceptions.CustomerNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -29,6 +34,17 @@ public class GlobalExceptionHandler {
         response.setStatus(400);
         response.setError("BAD_REQUEST");
         response.setMessage(datesInvalidException.getMessage());
+
+        return new ResponseEntity<ExceptionResponse>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ExceptionResponse> badRequest(BadRequestException badRequestException){
+        ExceptionResponse response = new ExceptionResponse();
+        response.setTimestamp(LocalDateTime.now());
+        response.setStatus(400);
+        response.setError("BAD_REQUEST");
+        response.setMessage(badRequestException.getMessage());
 
         return new ResponseEntity<ExceptionResponse>(response, HttpStatus.BAD_REQUEST);
     }
@@ -77,6 +93,17 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<ExceptionResponse>(response, HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(ReservationAlreadyCancelledException.class)
+    public ResponseEntity<ExceptionResponse> reservationAlreadyCancelledException(ReservationAlreadyCancelledException reservationAlreadyCancelledException){
+        ExceptionResponse response = new ExceptionResponse();
+        response.setTimestamp(LocalDateTime.now());
+        response.setStatus(409);
+        response.setError("CONFLICT");
+        response.setMessage(reservationAlreadyCancelledException.getMessage());
+
+        return new ResponseEntity<ExceptionResponse>(response, HttpStatus.CONFLICT);
+    }
+
     @ExceptionHandler(ReservationUsernamesDoNotMatchException.class)
     public ResponseEntity<ExceptionResponse> reservationUsernamesDoNotMatchException(ReservationUsernamesDoNotMatchException reservationUsernamesDoNotMatchException){
         ExceptionResponse response = new ExceptionResponse();
@@ -108,5 +135,16 @@ public class GlobalExceptionHandler {
         response.setMessage(roomTypeNotFoundException.getMessage());
 
         return new ResponseEntity<ExceptionResponse>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(NotImplementedException.class)
+    public ResponseEntity<ExceptionResponse>  notImplementedException(NotImplementedException notImplementedException){
+        ExceptionResponse response = new ExceptionResponse();
+        response.setTimestamp(LocalDateTime.now());
+        response.setStatus(501);
+        response.setError("NOT_IMPLEMENTED");
+        response.setMessage(notImplementedException.getMessage());
+
+        return new ResponseEntity<ExceptionResponse>(response, HttpStatus.NOT_IMPLEMENTED);
     }
 }

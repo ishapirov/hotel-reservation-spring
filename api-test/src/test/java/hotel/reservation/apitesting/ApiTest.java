@@ -4,8 +4,7 @@
 package hotel.reservation.apitesting;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ishapirov.hotelapi.domainapi.RoomInformation;
-import com.ishapirov.hotelapi.domainapi.RoomTypeInformation;
+import com.ishapirov.hotelapi.roomservice.domain.RoomInformation;
 import io.restassured.path.json.JsonPath;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
@@ -26,22 +25,21 @@ public class ApiTest extends BaseClass {
 
     @Test
     public void testTest() throws URISyntaxException {
-        given().accept(ContentType.JSON).when().get(new URI("/test")).then().assertThat().statusCode(HttpStatus.SC_OK)
+        given().accept(ContentType.JSON).when().get(new URI("/services/test")).then().assertThat().statusCode(HttpStatus.SC_OK)
                 .body("message", equalTo("Test successful!"));
 
     }
 
     @Test
     public void testGetExistingRoom() throws URISyntaxException, JsonProcessingException {
-        RoomTypeInformation roomTypeInformation = new RoomTypeInformation("Single");
-        RoomInformation roomInformation = new RoomInformation(913,roomTypeInformation,212.);
+
+        RoomInformation roomInformation = new RoomInformation(1858,"Single",215.);
         String roomInformationJson = mapper.writeValueAsString(roomInformation);
         JsonPath jsonPath = JsonPath.from(roomInformationJson);
 
         given()
         .accept(ContentType.JSON)
-        .param("roomNumber", "913")
-        .when().get(new URI("/getroom"))
+        .when().get(new URI("/services/rooms/1858"))
         .then().assertThat()
         .statusCode(HttpStatus.SC_OK)
         .body(  "",equalTo(jsonPath.get()));
@@ -52,21 +50,19 @@ public class ApiTest extends BaseClass {
     public void testGetNonExistingRoom() throws URISyntaxException {
         given()
         .accept(ContentType.JSON)
-        .param("roomNumber", "120")
-        .when().get(new URI("/getroom"))
+        .when().get(new URI("/services/rooms/120"))
         .then().assertThat()
         .statusCode(HttpStatus.SC_NOT_FOUND);
     }
 
     @Test
     public void testGetAllRooms() throws URISyntaxException, JsonProcessingException {
-        RoomTypeInformation roomTypeInformation = new RoomTypeInformation("Suite");
-        RoomInformation roomInformation = new RoomInformation(961,roomTypeInformation,404.);
+        RoomInformation roomInformation = new RoomInformation(1908,"Suite",454.);
         String roomInformationJson = mapper.writeValueAsString(roomInformation);
         JsonPath jsonPath = JsonPath.from(roomInformationJson);
 
         given().accept(ContentType.JSON)
-        .when().get(new URI("/getallrooms"))
+        .when().get(new URI("/services/rooms"))
         .then().assertThat()
         .statusCode(HttpStatus.SC_OK).body("size()", equalTo(100),
          "get(50)", equalTo(jsonPath.get()));
@@ -74,15 +70,14 @@ public class ApiTest extends BaseClass {
 
     @Test
     public void testGetRoomsByType() throws URISyntaxException, JsonProcessingException {
-        RoomTypeInformation roomTypeInformation = new RoomTypeInformation("Penthouse");
-        RoomInformation roomInformation = new RoomInformation(987,roomTypeInformation,774.);
+        RoomInformation roomInformation = new RoomInformation(1934,"Penthouse",982.);
         String roomInformationJson = mapper.writeValueAsString(roomInformation);
         JsonPath jsonPath = JsonPath.from(roomInformationJson);
 
         given().contentType(ContentType.JSON)
         .param("roomType","Penthouse")
         .accept(ContentType.JSON)
-        .when().get(new URI("/getallrooms")).then().assertThat()
+        .when().get(new URI("/services/rooms")).then().assertThat()
         .statusCode(HttpStatus.SC_OK)
         .body("size()",equalTo(25),
                 "get(1)",equalTo(jsonPath.get()));
@@ -91,13 +86,12 @@ public class ApiTest extends BaseClass {
 
     @Test
     public void testAvailableRoomsNoType() throws URISyntaxException, JsonProcessingException {
-        //There is a reservation set for this time for room 912, so the second room in the returned list should be room 913.
+        //There is a reservation set for this time for room 1859, so the second room in the returned list should be room 1860.
         //The test is done with
         String d1 ="2110-10-10T17:24:56.081Z";
         String d2 ="2110-10-11T17:24:56.081Z";
 
-        RoomTypeInformation roomTypeInformation = new RoomTypeInformation("Single");
-        RoomInformation roomInformation = new RoomInformation(913,roomTypeInformation,212.);
+        RoomInformation roomInformation = new RoomInformation(1860,"Single",187.);
         String roomInformationJson = mapper.writeValueAsString(roomInformation);
         JsonPath jsonPath = JsonPath.from(roomInformationJson);
 
@@ -105,7 +99,7 @@ public class ApiTest extends BaseClass {
         .param("checkInDate",d1)
         .and().param("checkOutDate",d2)
         .accept(ContentType.JSON)
-        .when().get(new URI("/getavailablerooms")).then().assertThat()
+        .when().get(new URI("/services/rooms")).then().assertThat()
         .statusCode(HttpStatus.SC_OK)
         .body("size()",equalTo(99),
                 "get(1)",equalTo(jsonPath.get()));
@@ -114,13 +108,12 @@ public class ApiTest extends BaseClass {
 
     @Test
     public void testAvailableRoomsByType() throws URISyntaxException, JsonProcessingException {
-        //There is a reservation set for this time for room 912, so the second room in the returned list should be room 913.
+        //There is a reservation set for this time for room 1859, so the third room in the returned list should be room 1861.
         String type = "Single";
         String d1 ="2110-10-10T17:24:56.081Z";
         String d2 ="2110-10-11T17:24:56.081Z";
 
-        RoomTypeInformation roomTypeInformation = new RoomTypeInformation("Single");
-        RoomInformation roomInformation = new RoomInformation(914,roomTypeInformation,138.);
+        RoomInformation roomInformation = new RoomInformation(1861,"Single",215.);
         String roomInformationJson = mapper.writeValueAsString(roomInformation);
         JsonPath jsonPath = JsonPath.from(roomInformationJson);
 
@@ -129,7 +122,7 @@ public class ApiTest extends BaseClass {
         .and().param("checkOutDate",d2)
         .and().param("roomType",type)
         .accept(ContentType.JSON)
-        .when().get(new URI("/getavailablerooms")).then().assertThat()
+        .when().get(new URI("/services/rooms")).then().assertThat()
         .statusCode(HttpStatus.SC_OK)
         .body("size()",equalTo(24),
                 "get(2)",equalTo(jsonPath.get()));

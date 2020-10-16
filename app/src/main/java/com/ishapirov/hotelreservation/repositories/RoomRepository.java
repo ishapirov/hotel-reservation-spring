@@ -3,8 +3,8 @@ package com.ishapirov.hotelreservation.repositories;
 import java.util.List;
 import java.util.Optional;
 
-import com.ishapirov.hotelreservation.hotelclasses.Room;
-import com.ishapirov.hotelreservation.hotelclasses.RoomType;
+import com.ishapirov.hotelreservation.domain.Room;
+import com.ishapirov.hotelreservation.domain.RoomType;
 import org.springframework.data.repository.CrudRepository;
 
 public interface RoomRepository extends CrudRepository<Room,Integer>{

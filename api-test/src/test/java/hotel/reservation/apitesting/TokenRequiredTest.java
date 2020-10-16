@@ -12,14 +12,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
-import com.ishapirov.hotelapi.cancel.CancelReservation;
-import com.ishapirov.hotelapi.domainapi.CustomerInformation;
-import com.ishapirov.hotelapi.domainapi.ReservationInformation;
-import com.ishapirov.hotelapi.domainapi.RoomInformation;
-import com.ishapirov.hotelapi.domainapi.RoomTypeInformation;
-import com.ishapirov.hotelapi.formdata.BookRoom;
-import com.ishapirov.hotelapi.formdata.CustomerCredentials;
-import com.ishapirov.hotelapi.formdata.CustomerSignupInformation;
+import com.ishapirov.hotelapi.reservationservice.CancelReservation;
+import com.ishapirov.hotelapi.reservationservice.domain.ReservationResponse;
+import com.ishapirov.hotelapi.roomservice.domain.RoomResponse;
+import com.ishapirov.hotelapi.userservice.domain.UserInformation;
+import com.ishapirov.hotelapi.reservationservice.domain.ReservationInformation;
+import com.ishapirov.hotelapi.roomservice.domain.RoomInformation;
+import com.ishapirov.hotelapi.roomservice.domain.RoomTypeInformation;
+import com.ishapirov.hotelapi.reservationservice.domain.BookRoom;
+import com.ishapirov.hotelapi.authenticationservice.credentials.UserCredentials;
+import com.ishapirov.hotelapi.userservice.domain.UserSignupInformation;
 import org.apache.http.HttpStatus;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -39,18 +41,18 @@ public class TokenRequiredTest extends BaseClass{
     @Test
     public void firstTestSignup() throws JsonProcessingException, URISyntaxException {
 
-        CustomerSignupInformation testCustomer = new CustomerSignupInformation(usernameTokenCreater.getUsername(),"123456","test@email.com","Test","User");
+        UserSignupInformation testCustomer = new UserSignupInformation(usernameTokenCreater.getUsername(),"123456","test@email.com","Test","User");
         String json = mapper.writeValueAsString(testCustomer);
 
-        CustomerInformation customerInformation = new CustomerInformation(usernameTokenCreater.getUsername(),"test@email.com","Test","User");
-        String customerInformationJson = mapper.writeValueAsString(customerInformation);
+        UserInformation userInformation = new UserInformation(usernameTokenCreater.getUsername(),"test@email.com","Test","User");
+        String customerInformationJson = mapper.writeValueAsString(userInformation);
         JsonPath jsonPath = JsonPath.from(customerInformationJson);
 
         given()
         .contentType(ContentType.JSON)
         .body(json)
         .accept(ContentType.JSON)
-        .when().post(new URI("/signup"))
+        .when().post(new URI("/services/users"))
         .then()
         .assertThat().statusCode(HttpStatus.SC_OK)
         .body("",equalTo(jsonPath.get()));
@@ -58,7 +60,7 @@ public class TokenRequiredTest extends BaseClass{
     @Test
     public void authenticateTest() throws  JsonProcessingException, URISyntaxException {
 
-        CustomerCredentials testCustomer = new CustomerCredentials("cooluser","123456");
+        UserCredentials testCustomer = new UserCredentials("cooluser","123456");
         String json = mapper.writeValueAsString(testCustomer);
         
         given()
@@ -66,7 +68,7 @@ public class TokenRequiredTest extends BaseClass{
         .body(json)
         .accept(ContentType.JSON)
         .when()
-        .post(new URI("/authenticate")).then().assertThat()
+        .post(new URI("/services/authentication")).then().assertThat()
         .statusCode(HttpStatus.SC_OK);
 
     }
@@ -79,10 +81,7 @@ public class TokenRequiredTest extends BaseClass{
         StdDateFormat format = new StdDateFormat();
         Date checkIn = format.parse("2110-10-10T17:24:56.081Z");
         Date checkOut = format.parse("2110-10-11T17:24:56.081Z");
-        RoomTypeInformation roomTypeInformation = new RoomTypeInformation("Single");
-        RoomInformation roomInformation = new RoomInformation(912,roomTypeInformation,204.);
-        CustomerInformation customerInformation = new CustomerInformation("cooluser","cooluser@gmail.com","Joe","Bob");
-        ReservationInformation reservationInformation = new ReservationInformation(1015,customerInformation,roomInformation,checkIn,checkOut);
+        ReservationInformation reservationInformation = new ReservationInformation(1959, "cooluser",1859,checkIn,checkOut);
         String reservationInformationJson = mapper.writeValueAsString(reservationInformation);
         JsonPath jsonPath = JsonPath.from(reservationInformationJson);
 
@@ -90,11 +89,35 @@ public class TokenRequiredTest extends BaseClass{
         .contentType(ContentType.JSON)
         .headers(headers)
         .accept(ContentType.JSON)
-        .param("reservationNumber", "1015")
-        .when().get(new URI("/viewreservation"))
+        .when().get(new URI("/services/reservations/1959"))
         .then()
         .assertThat().statusCode(HttpStatus.SC_OK)
         .body("",equalTo(jsonPath.get()));
+    }
+
+    @Test
+    public void testViewReservationResponse() throws URISyntaxException, JsonProcessingException, ParseException {
+        String token = usernameTokenCreater.getExistingToken();
+        Map<String,String> headers = new HashMap<>();
+        headers.put("Authorization", token);
+        StdDateFormat format = new StdDateFormat();
+        Date checkIn = format.parse("2110-10-10T17:24:56.081Z");
+        Date checkOut = format.parse("2110-10-11T17:24:56.081Z");
+        RoomTypeInformation roomTypeInformation = new RoomTypeInformation("Single");
+        RoomResponse roomResponse = new RoomResponse(1859,roomTypeInformation,208.);
+        UserInformation userInformation = new UserInformation("cooluser","cooluser@gmail.com","Joe","Bob");
+        ReservationResponse reservationInformation = new ReservationResponse(1959, userInformation,roomResponse,checkIn,checkOut);
+        String reservationInformationJson = mapper.writeValueAsString(reservationInformation);
+        JsonPath jsonPath = JsonPath.from(reservationInformationJson);
+
+        given()
+                .contentType(ContentType.JSON)
+                .headers(headers)
+                .accept(ContentType.JSON)
+                .when().get(new URI("/services/reservations/response/1959"))
+                .then()
+                .assertThat().statusCode(HttpStatus.SC_OK)
+                .body("",equalTo(jsonPath.get()));
     }
 
     @Test
@@ -107,8 +130,8 @@ public class TokenRequiredTest extends BaseClass{
         .contentType(ContentType.JSON)
         .headers(headers)
         .accept(ContentType.JSON)
-        .param("reservationNumber", "1015")
-        .when().get(new URI("/viewreservation"))
+        .param("reservationNumber", "1959")
+        .when().get(new URI("/services/reservations/1959"))
         .then()
         .assertThat().statusCode(HttpStatus.SC_FORBIDDEN);
     }
@@ -119,7 +142,7 @@ public class TokenRequiredTest extends BaseClass{
         Map<String,String> headers = new HashMap<>();
         headers.put("Authorization",token);
 
-        Integer roomNumber = 970;
+        Integer roomNumber = 1911;
         StdDateFormat format = new StdDateFormat();
         Date d1 = format.parse("2110-10-10T17:24:56.081Z");
         Date d2 = format.parse("2110-10-15T17:24:56.081Z");
@@ -132,15 +155,12 @@ public class TokenRequiredTest extends BaseClass{
         .body(json)
         .headers(headers)
         .accept(ContentType.JSON)
-        .when().post(new URI("/bookroom"));
+        .when().post(new URI("/services/reservations"));
 
         JsonPath jsonPath = new JsonPath(response.thenReturn().asString());
         int reservationNumber = jsonPath.getInt("reservationNumber");
 
-        RoomTypeInformation roomTypeInformation = new RoomTypeInformation("Suite");
-        RoomInformation roomInformation = new RoomInformation(970,roomTypeInformation,549.);
-        CustomerInformation customerInformation = new CustomerInformation(usernameTokenCreater.getUsername(),"test@email.com","Test","User");
-        ReservationInformation reservationInformation = new ReservationInformation(reservationNumber,customerInformation,roomInformation,d1,d2);
+        ReservationInformation reservationInformation = new ReservationInformation(reservationNumber, usernameTokenCreater.getUsername(),roomNumber,d1,d2);
         String reservationInformationJson = mapper.writeValueAsString(reservationInformation);
         jsonPath = JsonPath.from(reservationInformationJson);
 
@@ -148,12 +168,10 @@ public class TokenRequiredTest extends BaseClass{
         .body("",equalTo(jsonPath.get()));
 
         //Viewing reservation
-        given()
-                .contentType(ContentType.JSON)
+        given().contentType(ContentType.JSON)
                 .headers(headers)
                 .accept(ContentType.JSON)
-                .param("reservationNumber", reservationNumber)
-                .when().get(new URI("/viewreservation"))
+                .when().get(new URI("/services/reservations/"+reservationNumber))
                 .then()
                 .assertThat().statusCode(HttpStatus.SC_OK)
                 .body("",equalTo(jsonPath.get()));
@@ -165,12 +183,11 @@ public class TokenRequiredTest extends BaseClass{
         String checkOutTest = "2110-10-13T17:24:56.081Z";
 
         given().contentType(ContentType.JSON)
-        .param("checkInDate",checkInTest)
-        .and().param("checkOutDate",checkOutTest)
-        .and().param("roomNumber",roomNumber)
-        .accept(ContentType.JSON)
-        .when().get(new URI("/getroomifavailable")).then().assertThat()
-        .statusCode(HttpStatus.SC_CONFLICT);
+            .param("checkInDate",checkInTest)
+            .and().param("checkOutDate",checkOutTest)
+            .accept(ContentType.JSON)
+            .when().get(new URI("/services/rooms/" + roomNumber)).then().assertThat()
+            .statusCode(HttpStatus.SC_CONFLICT);
 
         //CheckIn: Inside interval. Checkout: Outside interval. Should be unavailable
         checkInTest = "2110-10-12T17:24:56.081Z";
@@ -178,12 +195,11 @@ public class TokenRequiredTest extends BaseClass{
 
 
         given().contentType(ContentType.JSON)
-        .param("checkInDate",checkInTest)
-        .and().param("checkOutDate",checkOutTest)
-        .and().param("roomNumber",roomNumber)
-        .accept(ContentType.JSON)
-        .when().get(new URI("/getroomifavailable")).then().assertThat()
-        .statusCode(HttpStatus.SC_CONFLICT);
+                .param("checkInDate",checkInTest)
+                .and().param("checkOutDate",checkOutTest)
+                .accept(ContentType.JSON)
+                .when().get(new URI("/services/rooms/" + roomNumber)).then().assertThat()
+                .statusCode(HttpStatus.SC_CONFLICT);
 
         //Testing availability of room at different time intervals
         //Checkin: Outside interval. Checkout: Outside interval. Should be unavailable
@@ -192,24 +208,23 @@ public class TokenRequiredTest extends BaseClass{
 
 
         given().contentType(ContentType.JSON)
-        .param("checkInDate",checkInTest)
-        .and().param("checkOutDate",checkOutTest)
-        .and().param("roomNumber",roomNumber)
-        .accept(ContentType.JSON)
-        .when().get(new URI("/getroomifavailable")).then().assertThat()
-        .statusCode(HttpStatus.SC_CONFLICT);
+                .param("checkInDate",checkInTest)
+                .and().param("checkOutDate",checkOutTest)
+                .accept(ContentType.JSON)
+                .when().get(new URI("/services/rooms/" + roomNumber)).then().assertThat()
+                .statusCode(HttpStatus.SC_CONFLICT);
 
 
         CancelReservation cancelReservation = new CancelReservation(reservationNumber);
         json = mapper.writeValueAsString(cancelReservation);
         
         given()
-        .contentType(ContentType.JSON)
-        .body(json)
-        .headers(headers)
-        .accept(ContentType.JSON)
-        .when().post(new URI("/cancelreservation"))
-        .then().assertThat().statusCode(HttpStatus.SC_NO_CONTENT);
+            .contentType(ContentType.JSON)
+            .body(json)
+            .headers(headers)
+            .accept(ContentType.JSON)
+            .when().delete(new URI("/services/reservations/"+reservationNumber))
+            .then().assertThat().statusCode(HttpStatus.SC_NO_CONTENT);
 
     }
 }
