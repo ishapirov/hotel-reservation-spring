@@ -13,14 +13,14 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	compileOnly 'org.projectlombok:lombok:1.18.14'
-	annotationProcessor 'org.projectlombok:lombok:1.18.14'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'org.postgresql:postgresql'
 
-	implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
-    testCompileOnly 'org.projectlombok:lombok:1.18.14'
-	testAnnotationProcessor 'org.projectlombok:lombok:1.18.14'
+	implementation group: 'io.jsonwebtoken', name: 'jjwt'
+    testCompileOnly 'org.projectlombok:lombok'
+	testAnnotationProcessor 'org.projectlombok:lombok'
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}

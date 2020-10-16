@@ -2,10 +2,10 @@ package com.ishapirov.hotelreservation.authentication;
 
 import java.util.Optional;
 
-import com.ishapirov.hotelreservation.hotelclasses.Customer;
-import com.ishapirov.hotelreservation.repositories.CustomerRepository;
-import com.ishapirov.hotelreservation.security.SecurityUser;
+import com.ishapirov.hotelreservation.repositories.UserSecurityRepository;
+import com.ishapirov.hotelreservation.security.MyUserDetailsService;
 
+import com.ishapirov.hotelreservation.domain.UserSecurity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,14 +16,14 @@ import org.springframework.stereotype.Service;
 public class ApplicationUserService implements UserDetailsService {
 
     @Autowired
-    private CustomerRepository userRepository;
+    private UserSecurityRepository userSecurityRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<Customer> user = userRepository.findByUsername(username);
+        Optional<UserSecurity> user = userSecurityRepository.findByUsername(username);
         user.orElseThrow(() -> 
             new UsernameNotFoundException(String.format("Username %s not found",username)));
-        return user.map(SecurityUser::new).get();
+        return user.map(MyUserDetailsService::new).get();
     }
 
 }

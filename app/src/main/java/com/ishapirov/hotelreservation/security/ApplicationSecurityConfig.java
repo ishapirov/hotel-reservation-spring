@@ -38,7 +38,12 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().disable();
         http.csrf().disable()
-                .authorizeRequests().antMatchers("/getroom","/test","/signup","/authenticate","/getallrooms","/getroomsbytype","/getavailableroomsbytype","/getavailablerooms","/getroomifavailable")
+                .authorizeRequests().antMatchers("/services/authentication/**",
+                                                 "/services/rooms",
+                                                 "/services/rooms/**",
+                                                 "/services/test",
+                                                 "/services/test/**",
+                                                 "/services/users")
                 .permitAll()
                 .antMatchers(HttpMethod.OPTIONS,"/**").permitAll()
                 .anyRequest().authenticated()

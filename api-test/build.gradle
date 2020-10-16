@@ -10,18 +10,16 @@ configurations {
 
 dependencies {
     // This dependency is used by the application.
-    testCompileOnly 'org.projectlombok:lombok:1.18.14'
-	testAnnotationProcessor 'org.projectlombok:lombok:1.18.14'
-    implementation 'com.google.guava:guava:29.0-jre'
-    implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.3'
-    testImplementation 'io.rest-assured:rest-assured:4.2.0'
-    compile group: 'io.rest-assured', name: 'json-path', version: '4.2.0'
-    compile group: 'io.rest-assured', name: 'xml-path', version: '4.2.0'
-    implementation 'org.apache.commons:commons-lang3:3.11'
-
-    // Use JUnit test framework
-    testImplementation 'junit:junit:4.13'
+    testCompileOnly 'org.projectlombok:lombok'
+	testAnnotationProcessor 'org.projectlombok:lombok'
+    implementation 'com.google.guava:guava'
+    implementation group: 'io.jsonwebtoken', name: 'jjwt'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind'
+    testImplementation 'io.rest-assured:rest-assured'
+    implementation group: 'io.rest-assured', name: 'json-path'
+    implementation group: 'io.rest-assured', name: 'xml-path'
+    implementation 'org.apache.commons:commons-lang3'
+    testImplementation 'junit:junit'
     implementation project(':api')
 }
 
