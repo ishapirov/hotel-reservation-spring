@@ -7,7 +7,7 @@ To build:
 To run an individual module build (examples):
 
     ./gradlew app:bootJar
-    ./gradlew api:package
+    ./gradlew api:build
 
 To run api tests:
 
