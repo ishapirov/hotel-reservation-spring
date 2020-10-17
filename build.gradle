@@ -19,20 +19,18 @@ subprojects {
         imports {
             mavenBom('org.springframework.boot:spring-boot-dependencies:2.3.4.RELEASE')
         }
+        dependencies {
+            dependency 'com.google.guava:guava:29.0-jre'
+            dependency 'org.projectlombok:lombok:1.18.14'
+            dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.3'
+            dependency 'io.rest-assured:rest-assured:4.2.0'
+            dependency group: 'io.rest-assured', name: 'json-path', version: '4.2.0'
+            dependency group: 'io.rest-assured', name: 'xml-path', version: '4.2.0'
+            dependency 'org.apache.commons:commons-lang3:3.11'
+            dependency 'junit:junit:4.13'
+            dependency group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+        }
 
-    }
-
-    dependencies {
-        implementation 'com.google.guava:guava:29.0-jre'
-        compileOnly 'org.projectlombok:lombok:1.18.14'
-        annotationProcessor 'org.projectlombok:lombok:1.18.14'
-        implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.3'
-        testImplementation 'io.rest-assured:rest-assured:4.2.0'
-        implementation group: 'io.rest-assured', name: 'json-path', version: '4.2.0'
-        implementation group: 'io.rest-assured', name: 'xml-path', version: '4.2.0'
-        implementation 'org.apache.commons:commons-lang3:3.11'
-        testImplementation 'junit:junit:4.13'
-        implementation group: 'io.jsonwebtoken', name: 'jjwt', version:  '0.9.1'
     }
 }
 
