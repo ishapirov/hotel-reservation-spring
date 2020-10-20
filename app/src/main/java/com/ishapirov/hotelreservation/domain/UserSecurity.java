@@ -1,8 +1,10 @@
 package com.ishapirov.hotelreservation.domain;
 
 import com.ishapirov.hotelapi.userservice.domain.UserSignupInformation;
+import com.ishapirov.hotelreservation.repositories.RoleRepository;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -17,6 +19,8 @@ public class UserSecurity {
     private String username;
     private String password;
 
+
+
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_roles",
@@ -25,13 +29,10 @@ public class UserSecurity {
     )
     private Set<Role> roles = new HashSet<>();
 
-    public UserSecurity(UserSignupInformation userSignupInformation){
+    public UserSecurity(UserSignupInformation userSignupInformation, HashSet<Role> roles){
         this.username = userSignupInformation.getUsername();
         this.password = userSignupInformation.getPassword();
-        this.roles = new HashSet<>();
-        Role role = new Role();
-        role.setName("ROLE_USER");
-        this.roles.add(role);
+        this.roles = roles;
     }
 
 }

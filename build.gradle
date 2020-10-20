@@ -29,6 +29,8 @@ subprojects {
             dependency 'org.apache.commons:commons-lang3:3.11'
             dependency 'junit:junit:4.13'
             dependency group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+            dependency group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.4.8'
+            dependency group: 'org.passay', name: 'passay', version: '1.6.0'
         }
 
     }

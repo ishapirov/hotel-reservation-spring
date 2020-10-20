@@ -33,13 +33,13 @@ public class ApiTest extends BaseClass {
     @Test
     public void testGetExistingRoom() throws URISyntaxException, JsonProcessingException {
 
-        RoomInformation roomInformation = new RoomInformation(1858,"Single",215.);
+        RoomInformation roomInformation = new RoomInformation(1985,"Single",214.);
         String roomInformationJson = mapper.writeValueAsString(roomInformation);
         JsonPath jsonPath = JsonPath.from(roomInformationJson);
 
         given()
         .accept(ContentType.JSON)
-        .when().get(new URI("/services/rooms/1858"))
+        .when().get(new URI("/services/rooms/1985"))
         .then().assertThat()
         .statusCode(HttpStatus.SC_OK)
         .body(  "",equalTo(jsonPath.get()));
@@ -52,12 +52,12 @@ public class ApiTest extends BaseClass {
         .accept(ContentType.JSON)
         .when().get(new URI("/services/rooms/120"))
         .then().assertThat()
-        .statusCode(HttpStatus.SC_NOT_FOUND);
+        .statusCode(HttpStatus.SC_BAD_REQUEST);
     }
 
     @Test
     public void testGetAllRooms() throws URISyntaxException, JsonProcessingException {
-        RoomInformation roomInformation = new RoomInformation(1908,"Suite",454.);
+        RoomInformation roomInformation = new RoomInformation(2035,"Suite",397.);
         String roomInformationJson = mapper.writeValueAsString(roomInformation);
         JsonPath jsonPath = JsonPath.from(roomInformationJson);
 
@@ -70,7 +70,7 @@ public class ApiTest extends BaseClass {
 
     @Test
     public void testGetRoomsByType() throws URISyntaxException, JsonProcessingException {
-        RoomInformation roomInformation = new RoomInformation(1934,"Penthouse",982.);
+        RoomInformation roomInformation = new RoomInformation(2061,"Penthouse",814.);
         String roomInformationJson = mapper.writeValueAsString(roomInformation);
         JsonPath jsonPath = JsonPath.from(roomInformationJson);
 
@@ -86,12 +86,11 @@ public class ApiTest extends BaseClass {
 
     @Test
     public void testAvailableRoomsNoType() throws URISyntaxException, JsonProcessingException {
-        //There is a reservation set for this time for room 1859, so the second room in the returned list should be room 1860.
-        //The test is done with
+        //There is a reservation set for this time for room 1986, so the second room in the returned list should be room 1987.
         String d1 ="2110-10-10T17:24:56.081Z";
         String d2 ="2110-10-11T17:24:56.081Z";
 
-        RoomInformation roomInformation = new RoomInformation(1860,"Single",187.);
+        RoomInformation roomInformation = new RoomInformation(1987,"Single",199.);
         String roomInformationJson = mapper.writeValueAsString(roomInformation);
         JsonPath jsonPath = JsonPath.from(roomInformationJson);
 
@@ -108,12 +107,12 @@ public class ApiTest extends BaseClass {
 
     @Test
     public void testAvailableRoomsByType() throws URISyntaxException, JsonProcessingException {
-        //There is a reservation set for this time for room 1859, so the third room in the returned list should be room 1861.
+        //There is a reservation set for this time for room 1986, so the third room in the returned list should be room 1988.
         String type = "Single";
         String d1 ="2110-10-10T17:24:56.081Z";
         String d2 ="2110-10-11T17:24:56.081Z";
 
-        RoomInformation roomInformation = new RoomInformation(1861,"Single",215.);
+        RoomInformation roomInformation = new RoomInformation(1988,"Single",179.);
         String roomInformationJson = mapper.writeValueAsString(roomInformation);
         JsonPath jsonPath = JsonPath.from(roomInformationJson);
 

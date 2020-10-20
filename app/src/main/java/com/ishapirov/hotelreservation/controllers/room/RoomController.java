@@ -18,6 +18,7 @@ import com.ishapirov.hotelreservation.util.DomainToApiMapper;
 import com.ishapirov.hotelreservation.util.HotelUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
+@Validated
 public class RoomController implements RoomService {
 
     @Autowired

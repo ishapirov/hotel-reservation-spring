@@ -12,12 +12,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
-import com.ishapirov.hotelapi.reservationservice.CancelReservation;
+import com.ishapirov.hotelapi.reservationservice.domain.CancelReservation;
 import com.ishapirov.hotelapi.reservationservice.domain.ReservationResponse;
 import com.ishapirov.hotelapi.roomservice.domain.RoomResponse;
 import com.ishapirov.hotelapi.userservice.domain.UserInformation;
 import com.ishapirov.hotelapi.reservationservice.domain.ReservationInformation;
-import com.ishapirov.hotelapi.roomservice.domain.RoomInformation;
 import com.ishapirov.hotelapi.roomservice.domain.RoomTypeInformation;
 import com.ishapirov.hotelapi.reservationservice.domain.BookRoom;
 import com.ishapirov.hotelapi.authenticationservice.credentials.UserCredentials;
@@ -41,7 +40,7 @@ public class TokenRequiredTest extends BaseClass{
     @Test
     public void firstTestSignup() throws JsonProcessingException, URISyntaxException {
 
-        UserSignupInformation testCustomer = new UserSignupInformation(usernameTokenCreater.getUsername(),"123456","test@email.com","Test","User");
+        UserSignupInformation testCustomer = new UserSignupInformation(usernameTokenCreater.getUsername(),"Coolpass-123","test@email.com","Test","User");
         String json = mapper.writeValueAsString(testCustomer);
 
         UserInformation userInformation = new UserInformation(usernameTokenCreater.getUsername(),"test@email.com","Test","User");
@@ -57,10 +56,27 @@ public class TokenRequiredTest extends BaseClass{
         .assertThat().statusCode(HttpStatus.SC_OK)
         .body("",equalTo(jsonPath.get()));
     }
+
+    @Test
+    public void badPasswordSignupTest() throws JsonProcessingException, URISyntaxException {
+
+        UserSignupInformation testCustomer = new UserSignupInformation("RandomName","123456","test@email.com","Test","User");
+        String json = mapper.writeValueAsString(testCustomer);
+
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(json)
+                .accept(ContentType.JSON)
+                .when().post(new URI("/services/users"))
+                .then()
+                .assertThat().statusCode(HttpStatus.SC_BAD_REQUEST);
+    }
+
     @Test
     public void authenticateTest() throws  JsonProcessingException, URISyntaxException {
 
-        UserCredentials testCustomer = new UserCredentials("cooluser","123456");
+        UserCredentials testCustomer = new UserCredentials("cooluser","Coolpass-123");
         String json = mapper.writeValueAsString(testCustomer);
         
         given()
@@ -81,7 +97,7 @@ public class TokenRequiredTest extends BaseClass{
         StdDateFormat format = new StdDateFormat();
         Date checkIn = format.parse("2110-10-10T17:24:56.081Z");
         Date checkOut = format.parse("2110-10-11T17:24:56.081Z");
-        ReservationInformation reservationInformation = new ReservationInformation(1959, "cooluser",1859,checkIn,checkOut);
+        ReservationInformation reservationInformation = new ReservationInformation(2086, "cooluser",1986,checkIn,checkOut);
         String reservationInformationJson = mapper.writeValueAsString(reservationInformation);
         JsonPath jsonPath = JsonPath.from(reservationInformationJson);
 
@@ -89,7 +105,7 @@ public class TokenRequiredTest extends BaseClass{
         .contentType(ContentType.JSON)
         .headers(headers)
         .accept(ContentType.JSON)
-        .when().get(new URI("/services/reservations/1959"))
+        .when().get(new URI("/services/reservations/2086"))
         .then()
         .assertThat().statusCode(HttpStatus.SC_OK)
         .body("",equalTo(jsonPath.get()));
@@ -104,9 +120,9 @@ public class TokenRequiredTest extends BaseClass{
         Date checkIn = format.parse("2110-10-10T17:24:56.081Z");
         Date checkOut = format.parse("2110-10-11T17:24:56.081Z");
         RoomTypeInformation roomTypeInformation = new RoomTypeInformation("Single");
-        RoomResponse roomResponse = new RoomResponse(1859,roomTypeInformation,208.);
+        RoomResponse roomResponse = new RoomResponse(1986,roomTypeInformation,150.);
         UserInformation userInformation = new UserInformation("cooluser","cooluser@gmail.com","Joe","Bob");
-        ReservationResponse reservationInformation = new ReservationResponse(1959, userInformation,roomResponse,checkIn,checkOut);
+        ReservationResponse reservationInformation = new ReservationResponse(2086, userInformation,roomResponse,checkIn,checkOut);
         String reservationInformationJson = mapper.writeValueAsString(reservationInformation);
         JsonPath jsonPath = JsonPath.from(reservationInformationJson);
 
@@ -114,7 +130,7 @@ public class TokenRequiredTest extends BaseClass{
                 .contentType(ContentType.JSON)
                 .headers(headers)
                 .accept(ContentType.JSON)
-                .when().get(new URI("/services/reservations/response/1959"))
+                .when().get(new URI("/services/reservations/response/2086"))
                 .then()
                 .assertThat().statusCode(HttpStatus.SC_OK)
                 .body("",equalTo(jsonPath.get()));
@@ -130,8 +146,8 @@ public class TokenRequiredTest extends BaseClass{
         .contentType(ContentType.JSON)
         .headers(headers)
         .accept(ContentType.JSON)
-        .param("reservationNumber", "1959")
-        .when().get(new URI("/services/reservations/1959"))
+        .param("reservationNumber", "2086")
+        .when().get(new URI("/services/reservations/2086"))
         .then()
         .assertThat().statusCode(HttpStatus.SC_FORBIDDEN);
     }
@@ -142,7 +158,7 @@ public class TokenRequiredTest extends BaseClass{
         Map<String,String> headers = new HashMap<>();
         headers.put("Authorization",token);
 
-        Integer roomNumber = 1911;
+        Integer roomNumber = 2035;
         StdDateFormat format = new StdDateFormat();
         Date d1 = format.parse("2110-10-10T17:24:56.081Z");
         Date d2 = format.parse("2110-10-15T17:24:56.081Z");

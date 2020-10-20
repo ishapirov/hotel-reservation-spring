@@ -1,9 +1,11 @@
-package com.ishapirov.hotelreservation.exceptions;
+package com.ishapirov.hotelapi.exceptionresponse;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 public class ExceptionResponse {
@@ -12,6 +14,6 @@ public class ExceptionResponse {
     private Integer status;
     private String error;
     private String message;
-
+    private List<Violation> inputViolations = new ArrayList<>();
 }
 

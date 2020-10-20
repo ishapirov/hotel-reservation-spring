@@ -43,7 +43,8 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                                                  "/services/rooms/**",
                                                  "/services/test",
                                                  "/services/test/**",
-                                                 "/services/users")
+                                                 "/services/users",
+                                                 "/api-docs/**")
                 .permitAll()
                 .antMatchers(HttpMethod.OPTIONS,"/**").permitAll()
                 .anyRequest().authenticated()

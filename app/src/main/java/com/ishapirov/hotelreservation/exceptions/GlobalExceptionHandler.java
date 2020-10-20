@@ -1,6 +1,8 @@
 package com.ishapirov.hotelreservation.exceptions;
 
 import com.ishapirov.hotelapi.authenticationservice.exceptions.InvalidUsernameOrPasswordException;
+import com.ishapirov.hotelapi.exceptionresponse.ExceptionResponse;
+import com.ishapirov.hotelapi.exceptionresponse.Violation;
 import com.ishapirov.hotelapi.generalexceptions.*;
 import com.ishapirov.hotelapi.reservationservice.exceptions.*;
 import com.ishapirov.hotelapi.roomservice.exceptions.RoomNotFoundException;
@@ -8,12 +10,15 @@ import com.ishapirov.hotelapi.roomservice.exceptions.RoomTypeNotFoundException;
 import com.ishapirov.hotelapi.userservice.exceptions.CustomerNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(CustomerNotFoundException.class)
@@ -146,5 +151,37 @@ public class GlobalExceptionHandler {
         response.setMessage(notImplementedException.getMessage());
 
         return new ResponseEntity<ExceptionResponse>(response, HttpStatus.NOT_IMPLEMENTED);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    ExceptionResponse onConstraintValidationException(
+            ConstraintViolationException e) {
+        ExceptionResponse response = new ExceptionResponse();
+        response.setTimestamp(LocalDateTime.now());
+        response.setStatus(400);
+        response.setError("BAD_REQUEST");
+        response.setMessage("One or more constraints were violated");
+        for (ConstraintViolation violation : e.getConstraintViolations()) {
+            response.getInputViolations().add(
+                    new Violation(violation.getPropertyPath().toString(), violation.getMessage()));
+        }
+        return response;
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    ExceptionResponse onMethodArgumentNotValidException(
+            MethodArgumentNotValidException e) {
+        ExceptionResponse response = new ExceptionResponse();
+        response.setTimestamp(LocalDateTime.now());
+        response.setStatus(400);
+        response.setError("BAD_REQUEST");
+        response.setMessage("One or more constraints were violated");
+        for (FieldError fieldError : e.getBindingResult().getFieldErrors()) {
+            response.getInputViolations().add(
+                    new Violation(fieldError.getField(), fieldError.getDefaultMessage()));
+        }
+        return response;
     }
 }

@@ -1,16 +1,18 @@
 package com.ishapirov.hotelapi.reservationservice;
 
-import com.ishapirov.hotelapi.reservationservice.domain.ReservationInformation;
-import com.ishapirov.hotelapi.reservationservice.domain.BookRoom;
-import com.ishapirov.hotelapi.reservationservice.domain.ReservationResponse;
-import com.ishapirov.hotelapi.reservationservice.domain.ReservationUpdate;
+import com.ishapirov.hotelapi.reservationservice.domain.*;
 import com.ishapirov.hotelapi.reservationservice.domain.admin.BookRoomForCustomer;
+import com.ishapirov.hotelapi.reservationservice.domain.admin.CancelReservationForCustomer;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.util.List;
 
 @RestController
+@Validated
 @RequestMapping("/services/reservations")
 public interface ReservationService {
 
@@ -18,34 +20,34 @@ public interface ReservationService {
     List<ReservationInformation> getReservations();
 
     @GetMapping("/{reservationNumber}")
-    ReservationInformation getReservation(@PathVariable Integer reservationNumber);
+    ReservationInformation getReservation(@PathVariable @Positive Integer reservationNumber);
 
     @PostMapping
-    ReservationInformation bookReservation(@RequestBody BookRoom bookRoom);
+    ReservationInformation bookReservation(@RequestBody @Valid BookRoom bookRoom);
 
     @PutMapping("/{reservationNumber}")
-    ReservationInformation updateReservation(@PathVariable Integer reservationNumber,
-                                             @RequestBody ReservationUpdate reservationUpdate);
+    ReservationInformation updateReservation(@PathVariable @Positive Integer reservationNumber,
+                                             @RequestBody @Valid ReservationUpdate reservationUpdate);
 
     @DeleteMapping("/{reservationNumber}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    void deleteReservation(@PathVariable Integer reservationNumber);
+    void deleteReservation(@PathVariable @Positive Integer reservationNumber);
 
     @PostMapping("/cancel")
-    ReservationInformation cancelReservation(@RequestBody CancelReservation cancelReservation);
+    ReservationInformation cancelReservation(@RequestBody @Valid CancelReservation cancelReservation);
 
     @GetMapping("/response/{reservationNumber}")
-    ReservationResponse getReservationResponse(@PathVariable Integer reservationNumber);
+    ReservationResponse getReservationResponse(@PathVariable @Positive Integer reservationNumber);
 
     /**
      * @PreAuthorize("hasRole('ROLE_ADMIN')")
      */
     @PostMapping("/admin")
-    ReservationInformation bookRoomForCustomer(@RequestBody BookRoomForCustomer bookRoomForCustomer);
+    ReservationInformation bookRoomForCustomer(@RequestBody @Valid BookRoomForCustomer bookRoomForCustomer);
 
     /**
      * @PreAuthorize("hasRole('ROLE_ADMIN')")
      */
     @PostMapping("/admin/cancel")
-    ReservationInformation cancelRoomForCustomer(@RequestBody CancelReservation cancelReservation);
+    ReservationInformation cancelRoomForCustomer(@RequestBody @Valid CancelReservationForCustomer cancelReservation);
 }

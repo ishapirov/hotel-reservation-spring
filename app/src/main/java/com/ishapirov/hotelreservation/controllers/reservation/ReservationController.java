@@ -3,9 +3,10 @@ package com.ishapirov.hotelreservation.controllers.reservation;
 import com.ishapirov.hotelapi.generalexceptions.NotImplementedException;
 import com.ishapirov.hotelapi.reservationservice.domain.ReservationResponse;
 import com.ishapirov.hotelapi.reservationservice.domain.ReservationUpdate;
+import com.ishapirov.hotelapi.reservationservice.domain.admin.CancelReservationForCustomer;
 import com.ishapirov.hotelapi.reservationservice.exceptions.*;
 import com.ishapirov.hotelapi.roomservice.exceptions.RoomNotFoundException;
-import com.ishapirov.hotelapi.reservationservice.CancelReservation;
+import com.ishapirov.hotelapi.reservationservice.domain.CancelReservation;
 import com.ishapirov.hotelapi.reservationservice.ReservationService;
 import com.ishapirov.hotelapi.reservationservice.domain.BookRoom;
 import com.ishapirov.hotelapi.reservationservice.domain.ReservationInformation;
@@ -24,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.transaction.Transactional;
@@ -31,6 +33,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
+@Validated
 public class ReservationController implements ReservationService {
     @Autowired
     private UserRepository userRepository;
@@ -141,7 +144,7 @@ public class ReservationController implements ReservationService {
 
     @Override
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ReservationInformation cancelRoomForCustomer(CancelReservation cancelReservation) {
+    public ReservationInformation cancelRoomForCustomer(CancelReservationForCustomer cancelReservation) {
         throw new NotImplementedException("This operation is not yet supported");
     }
 
