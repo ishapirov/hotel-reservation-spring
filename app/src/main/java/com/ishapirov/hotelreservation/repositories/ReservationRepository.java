@@ -6,7 +6,9 @@ import java.util.Optional;
 import com.ishapirov.hotelreservation.domain.Reservation;
 import com.ishapirov.hotelreservation.domain.Room;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface ReservationRepository extends CrudRepository<Reservation,Integer> {
     Optional<Reservation>findByReservationNumber(Integer reservationNumber);
     List<Reservation> findByRoom(Room room);
