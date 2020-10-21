@@ -1,0 +1,45 @@
+# This workflow will build a Java project with Gradle
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
+
+name: Java CI with Gradle
+
+on:
+  push:
+    branches: [ main, docker-test]
+  pull_request:
+    branches: [ main, docker-test]
+env:
+    IMAGE_NAME: hotel-image
+    AWS_DEFAULT_REGION: us-east-1
+    AWS_DEFAULT_OUTPUT: json
+    AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+    AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Java 14
+      uses: actions/setup-java@v1
+      with:
+        java-version: '14'
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+    - name: Build with Gradle
+      run: ./gradlew build -x test
+      
+    - name: Setup ECR
+      run: |
+        $( aws ecr get-login --no-include-email )
+
+    - name: Build and tag the image
+      run: |
+        docker build \
+          -t $IMAGE_NAME \
+          -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_NAME ./app
+
+    - name: Push
+      if: github.ref == 'refs/heads/master'
+      run: |
+        docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_NAME
