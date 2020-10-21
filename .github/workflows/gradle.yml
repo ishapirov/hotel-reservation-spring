@@ -5,9 +5,9 @@ name: Java CI with Gradle
 
 on:
   push:
-    branches: [ main, docker-test]
+    branches: [ main ]
   pull_request:
-    branches: [ main, docker-test]
+    branches: [ main ]
 env:
     IMAGE_NAME: hotel-image
     AWS_DEFAULT_REGION: us-east-1
