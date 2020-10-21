@@ -2,6 +2,7 @@ package com.ishapirov.hotelapi.userservice;
 
 import com.ishapirov.hotelapi.userservice.domain.UserInformation;
 import com.ishapirov.hotelapi.userservice.domain.UserSignupInformation;
+import org.springframework.data.domain.Page;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +20,7 @@ public interface UserService {
      * @PreAuthorize("hasRole('ROLE_ADMIN')")
      */
     @GetMapping
-    List<UserInformation> getUsers();
+    Page<UserInformation> getUsers();
 
     @PostMapping
     UserInformation newUser(@RequestBody @Valid UserSignupInformation userSignupInformation);

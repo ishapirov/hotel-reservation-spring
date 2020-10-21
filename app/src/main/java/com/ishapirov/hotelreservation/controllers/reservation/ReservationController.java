@@ -22,7 +22,11 @@ import com.ishapirov.hotelreservation.repositories.UserRepository;
 import com.ishapirov.hotelreservation.util.DomainToApiMapper;
 import com.ishapirov.hotelreservation.util.HotelUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
@@ -51,9 +55,16 @@ public class ReservationController implements ReservationService {
     private DomainToApiMapper domainToApiMapper;
 
     @Override
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public List<ReservationInformation> getReservations() {
-        throw new NotImplementedException("This operation is not yet supported");
+    public Page<ReservationInformation> getReservations(String username, Integer pageNumber) {
+        if(username == null ){
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            boolean hasUserRole = authentication.getAuthorities().stream()
+                    .anyMatch(r -> r.getAuthority().equals("ROLE_USER"));
+            throw new NotImplementedException("This operation is not yet supported");
+        }
+        Pageable pageable = PageRequest.of(pageNumber,10);
+        Page<Reservation> reservationPage = reservationRepository.findAllByUser_Username(username,pageable);
+        return domainToApiMapper.getReservationInformationPage(reservationPage,pageable);
     }
 
     @Override

@@ -64,8 +64,8 @@ public class ApiTest extends BaseClass {
         given().accept(ContentType.JSON)
         .when().get(new URI("/services/rooms"))
         .then().assertThat()
-        .statusCode(HttpStatus.SC_OK).body("size()", equalTo(100),
-         "get(50)", equalTo(jsonPath.get()));
+        .statusCode(HttpStatus.SC_OK).body("content.size()", equalTo(100),
+         "content.get(50)", equalTo(jsonPath.get()));
     }
 
     @Test
@@ -79,8 +79,8 @@ public class ApiTest extends BaseClass {
         .accept(ContentType.JSON)
         .when().get(new URI("/services/rooms")).then().assertThat()
         .statusCode(HttpStatus.SC_OK)
-        .body("size()",equalTo(25),
-                "get(1)",equalTo(jsonPath.get()));
+        .body("content.size()",equalTo(25),
+                "content.get(1)",equalTo(jsonPath.get()));
         
     }
 
@@ -100,8 +100,8 @@ public class ApiTest extends BaseClass {
         .accept(ContentType.JSON)
         .when().get(new URI("/services/rooms")).then().assertThat()
         .statusCode(HttpStatus.SC_OK)
-        .body("size()",equalTo(99),
-                "get(1)",equalTo(jsonPath.get()));
+        .body("content.size()",equalTo(99),
+                "content.get(1)",equalTo(jsonPath.get()));
         
     }
 
@@ -123,8 +123,8 @@ public class ApiTest extends BaseClass {
         .accept(ContentType.JSON)
         .when().get(new URI("/services/rooms")).then().assertThat()
         .statusCode(HttpStatus.SC_OK)
-        .body("size()",equalTo(24),
-                "get(2)",equalTo(jsonPath.get()));
+        .body("content.size()",equalTo(24),
+                "content.get(2)",equalTo(jsonPath.get()));
     }
 
     

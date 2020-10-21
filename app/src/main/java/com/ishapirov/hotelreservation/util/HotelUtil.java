@@ -6,25 +6,30 @@ import com.ishapirov.hotelreservation.domain.Reservation;
 import com.ishapirov.hotelreservation.domain.Room;
 import com.ishapirov.hotelreservation.repositories.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class HotelUtil {
     @Autowired
     ReservationRepository reservationRepository;
 
-    public List<Room> filterRooms(List<Room> rooms, Date checkInDate, Date checkOutDate) {
+    public Page<Room> filterRooms(Page<Room> rooms, Date checkInDate, Date checkOutDate, Pageable pageable) {
+        List<Room> roomList = rooms.getContent();
         List<Room> availableRooms = new ArrayList<>();
-        for (Room room : rooms){
+        for (Room room : roomList){
             List<Reservation> reservations = reservationRepository.findByRoomAndCancelled(room,false);
             if(isDateAvailable(reservations, checkInDate, checkOutDate))
                 availableRooms.add(room);
         }
-        return availableRooms;
+        return new PageImpl<>(availableRooms,pageable,rooms.getContent().size());
     }
 
     public boolean isDateAvailable(List<Reservation> reservations,Date checkin, Date checkout){

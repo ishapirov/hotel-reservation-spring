@@ -1,8 +1,10 @@
 package com.ishapirov.hotelapi.roomservice;
 
-import com.ishapirov.hotelapi.roomservice.domain.BasicRoomInformation;
+import com.ishapirov.hotelapi.roomservice.domain.RoomBasicInformation;
 import com.ishapirov.hotelapi.roomservice.domain.RoomInformation;
 import com.ishapirov.hotelapi.roomservice.domain.RoomUpdate;
+
+import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -10,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 import java.util.Date;
-import java.util.List;
 
 @RestController
 @Validated
@@ -18,9 +19,10 @@ import java.util.List;
 public interface RoomService {
 
     @GetMapping
-    List<BasicRoomInformation> getRooms(@RequestParam(required = false) @Size(max=32) String roomType,
-                                              @RequestParam(required = false) @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME) @FutureOrPresent Date checkInDate,
-                                              @RequestParam(required = false) @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME) @FutureOrPresent Date checkOutDate);
+    Page<RoomBasicInformation> getRooms(@RequestParam(required = false, defaultValue = "0") @PositiveOrZero Integer pageNumber,
+                                        @RequestParam(required = false) @Size(max=32) String roomType,
+                                        @RequestParam(required = false) @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME) @FutureOrPresent Date checkInDate,
+                                        @RequestParam(required = false) @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME) @FutureOrPresent Date checkOutDate);
 
     @GetMapping("/{roomNumber}")
     RoomInformation getRoom(@PathVariable  @Min(1985) @Max(2084) Integer roomNumber,

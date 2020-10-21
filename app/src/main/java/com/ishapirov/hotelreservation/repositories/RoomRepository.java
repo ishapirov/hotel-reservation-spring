@@ -1,14 +1,16 @@
 package com.ishapirov.hotelreservation.repositories;
 
-import java.util.List;
 import java.util.Optional;
 
 import com.ishapirov.hotelreservation.domain.Room;
 import com.ishapirov.hotelreservation.domain.RoomType;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface RoomRepository extends CrudRepository<Room,Integer>{
+
+public interface RoomRepository extends PagingAndSortingRepository<Room,Integer> {
     Optional<Room> findByRoomNumber(int roomNumber);
-    List<Room> findByRoomType(RoomType roomType);
-    List<Room> findAll();
+    Page<Room> findAllByRoomType(RoomType roomType, Pageable page);
+    Page<Room> findAll(org.springframework.data.domain.Pageable page);
 }

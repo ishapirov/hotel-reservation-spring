@@ -12,6 +12,7 @@ import com.ishapirov.hotelreservation.repositories.RoleRepository;
 import com.ishapirov.hotelreservation.repositories.UserRepository;
 import com.ishapirov.hotelreservation.util.DomainToApiMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
@@ -39,7 +40,7 @@ public class UserController implements UserService {
 
     @Override
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public List<UserInformation> getUsers() {
+    public Page<UserInformation> getUsers() {
         throw new NotImplementedException("This operation is not yet supported");
     }
 

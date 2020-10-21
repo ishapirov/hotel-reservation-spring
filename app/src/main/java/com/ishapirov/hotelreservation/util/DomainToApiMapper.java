@@ -1,7 +1,7 @@
 package com.ishapirov.hotelreservation.util;
 
 import com.ishapirov.hotelapi.reservationservice.domain.ReservationResponse;
-import com.ishapirov.hotelapi.roomservice.domain.BasicRoomInformation;
+import com.ishapirov.hotelapi.roomservice.domain.RoomBasicInformation;
 import com.ishapirov.hotelapi.roomservice.domain.RoomResponse;
 import com.ishapirov.hotelapi.userservice.domain.UserInformation;
 import com.ishapirov.hotelapi.reservationservice.domain.ReservationInformation;
@@ -11,6 +11,9 @@ import com.ishapirov.hotelreservation.domain.User;
 import com.ishapirov.hotelreservation.domain.Reservation;
 import com.ishapirov.hotelreservation.domain.Room;
 import com.ishapirov.hotelreservation.domain.RoomType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,12 +22,12 @@ import java.util.stream.Collectors;
 @Service
 public class DomainToApiMapper {
 
-    public BasicRoomInformation getBasicRoomInformation(Room room){
-        BasicRoomInformation basicRoomInformation = new BasicRoomInformation();
-        basicRoomInformation.setRoomNumber(room.getRoomNumber());
-        basicRoomInformation.setRoomType(room.getRoomType().getName());
-        basicRoomInformation.setRoomPrice(room.getRoomPrice());
-        return basicRoomInformation;
+    public RoomBasicInformation getBasicRoomInformation(Room room){
+        RoomBasicInformation roomBasicInformation = new RoomBasicInformation();
+        roomBasicInformation.setRoomNumber(room.getRoomNumber());
+        roomBasicInformation.setRoomType(room.getRoomType().getName());
+        roomBasicInformation.setRoomPrice(room.getRoomPrice());
+        return roomBasicInformation;
     }
 
     public RoomInformation getRoomInformation(Room room){
@@ -44,10 +47,16 @@ public class DomainToApiMapper {
     }
 
 
-    public List<BasicRoomInformation> getBasicRoomsInformation(List<Room> rooms){
-        return rooms.stream()
+    public Page<RoomBasicInformation> getBasicRoomsInformation(Page<Room> rooms, Pageable pageable){
+        return new PageImpl<>(rooms.getContent().stream()
                 .map(this::getBasicRoomInformation)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()),pageable,rooms.getContent().size());
+    }
+
+    public Page<ReservationInformation> getReservationInformationPage(Page<Reservation> reservations, Pageable pageable){
+        return new PageImpl<>(reservations.getContent().stream()
+                .map(this::getReservationInformation)
+                .collect(Collectors.toList()),pageable,reservations.getContent().size());
     }
 
     public RoomTypeInformation getRoomTypeInformation(RoomType roomType){

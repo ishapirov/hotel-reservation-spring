@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class BasicRoomInformation {
+public class RoomBasicInformation {
     private Integer roomNumber;
     private String roomType;
     private Double roomPrice;

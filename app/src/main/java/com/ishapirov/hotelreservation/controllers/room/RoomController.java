@@ -6,7 +6,7 @@ import com.ishapirov.hotelapi.roomservice.domain.RoomUpdate;
 import com.ishapirov.hotelapi.roomservice.exceptions.RoomNotFoundException;
 import com.ishapirov.hotelapi.roomservice.exceptions.RoomTypeNotFoundException;
 import com.ishapirov.hotelapi.roomservice.RoomService;
-import com.ishapirov.hotelapi.roomservice.domain.BasicRoomInformation;
+import com.ishapirov.hotelapi.roomservice.domain.RoomBasicInformation;
 import com.ishapirov.hotelapi.roomservice.domain.RoomInformation;
 import com.ishapirov.hotelreservation.domain.Reservation;
 import com.ishapirov.hotelreservation.domain.Room;
@@ -17,6 +17,9 @@ import com.ishapirov.hotelreservation.repositories.RoomTypeRepository;
 import com.ishapirov.hotelreservation.util.DomainToApiMapper;
 import com.ishapirov.hotelreservation.util.HotelUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,22 +44,23 @@ public class RoomController implements RoomService {
     private HotelUtil hotelUtil;
 
     @Override
-    public List<BasicRoomInformation> getRooms(String roomType, Date checkInDate, Date checkOutDate) {
-        List<Room> rooms;
+    public Page<RoomBasicInformation> getRooms(Integer pageNumber, String roomType, Date checkInDate, Date checkOutDate) {
+        Page<Room> rooms;
+        Pageable pageable = PageRequest.of(pageNumber,100);
         if(roomType == null) {
-            rooms = roomRepository.findAll();
+            rooms = roomRepository.findAll(pageable);
         }
         else {
             Optional<RoomType> getRoomType = roomTypeRepository.findByName(roomType);
             if (getRoomType.isEmpty())
                 throw new RoomTypeNotFoundException("A room type with the given room type name was not found");
-            rooms = roomRepository.findByRoomType(getRoomType.get());
+            rooms = roomRepository.findAllByRoomType(getRoomType.get(),pageable);
         }
         if(checkInDate != null || checkOutDate != null){
             hotelUtil.validateDates(checkInDate, checkOutDate);
-            rooms = hotelUtil.filterRooms(rooms,checkInDate,checkOutDate);
+            rooms = hotelUtil.filterRooms(rooms,checkInDate,checkOutDate,pageable);
         }
-        return domainToApiMapper.getBasicRoomsInformation(rooms);
+        return domainToApiMapper.getBasicRoomsInformation(rooms,pageable);
     }
 
     @Override

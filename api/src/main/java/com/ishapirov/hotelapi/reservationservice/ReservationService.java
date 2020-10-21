@@ -3,12 +3,14 @@ package com.ishapirov.hotelapi.reservationservice;
 import com.ishapirov.hotelapi.reservationservice.domain.*;
 import com.ishapirov.hotelapi.reservationservice.domain.admin.BookRoomForCustomer;
 import com.ishapirov.hotelapi.reservationservice.domain.admin.CancelReservationForCustomer;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
@@ -17,7 +19,8 @@ import java.util.List;
 public interface ReservationService {
 
     @GetMapping
-    List<ReservationInformation> getReservations();
+    Page<ReservationInformation> getReservations(@RequestParam(required = false) String username,
+                                                 @RequestParam(required = false) @PositiveOrZero Integer pageNumber);
 
     @GetMapping("/{reservationNumber}")
     ReservationInformation getReservation(@PathVariable @Positive Integer reservationNumber);
