@@ -41,8 +41,7 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests().antMatchers("/services/authentication/**",
                                                  "/services/rooms",
                                                  "/services/rooms/**",
-                                                 "/services/test",
-                                                 "/services/test/**",
+                                                 "/services/reservations",
                                                  "/services/users",
                                                  "/api-docs/**")
                 .permitAll()

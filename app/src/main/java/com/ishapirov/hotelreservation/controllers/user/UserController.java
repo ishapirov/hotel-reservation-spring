@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.transaction.Transactional;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -54,7 +53,7 @@ public class UserController implements UserService {
         UserSecurity userSecurity = new UserSecurity(userSignupInformation,roles);
         user.setUserSecurity(userSecurity);
         userRepository.save(user);
-        return domainToApiMapper.getCustomerInformation(user);
+        return domainToApiMapper.getUserInformation(user);
     }
 
     @Override
@@ -62,7 +61,8 @@ public class UserController implements UserService {
         Optional<User> getUser = userRepository.findByUsername(username);
         if(getUser.isEmpty())
             throw new CustomerNotFoundException("A user with the given id was not found");
-        return domainToApiMapper.getCustomerInformation(getUser.get());
+
+        return domainToApiMapper.getUserInformation(getUser.get());
     }
 
     @Override

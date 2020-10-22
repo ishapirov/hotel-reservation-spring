@@ -9,9 +9,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
-import java.util.List;
 
 @RestController
 @Validated
@@ -19,8 +19,9 @@ import java.util.List;
 public interface ReservationService {
 
     @GetMapping
-    Page<ReservationInformation> getReservations(@RequestParam(required = false) String username,
-                                                 @RequestParam(required = false) @PositiveOrZero Integer pageNumber);
+    Page<ReservationInformation> getReservations(@RequestParam(required = false, defaultValue = "0") @PositiveOrZero Integer pageNumber,
+                                                 @RequestParam(required = false, defaultValue = "10") @PositiveOrZero @Max(100) Integer size,
+                                                 @RequestParam(required = false) String username);
 
     @GetMapping("/{reservationNumber}")
     ReservationInformation getReservation(@PathVariable @Positive Integer reservationNumber);

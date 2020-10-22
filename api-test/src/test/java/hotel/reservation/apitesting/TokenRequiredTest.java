@@ -43,9 +43,12 @@ public class TokenRequiredTest extends BaseClass{
         UserSignupInformation testCustomer = new UserSignupInformation(usernameTokenCreater.getUsername(),"Coolpass-123","test@email.com","Test","User");
         String json = mapper.writeValueAsString(testCustomer);
 
-        UserInformation userInformation = new UserInformation(usernameTokenCreater.getUsername(),"test@email.com","Test","User");
-        String customerInformationJson = mapper.writeValueAsString(userInformation);
-        JsonPath jsonPath = JsonPath.from(customerInformationJson);
+        UserInformation userInformation = new UserInformation();
+        userInformation.setUsername(usernameTokenCreater.getUsername());
+        userInformation.setEmail("test@email.com");
+        userInformation.setFirstName("Test");
+        userInformation.setLastName("User");
+
 
         given()
         .contentType(ContentType.JSON)
@@ -54,7 +57,10 @@ public class TokenRequiredTest extends BaseClass{
         .when().post(new URI("/services/users"))
         .then()
         .assertThat().statusCode(HttpStatus.SC_OK)
-        .body("",equalTo(jsonPath.get()));
+        .body("username",equalTo(userInformation.getUsername()),
+                "email",equalTo(userInformation.getEmail()),
+                "firstName",equalTo(userInformation.getFirstName()),
+                "lastName",equalTo(userInformation.getLastName()));
     }
 
     @Test
@@ -121,7 +127,7 @@ public class TokenRequiredTest extends BaseClass{
         Date checkOut = format.parse("2110-10-11T17:24:56.081Z");
         RoomTypeInformation roomTypeInformation = new RoomTypeInformation("Single");
         RoomResponse roomResponse = new RoomResponse(1986,roomTypeInformation,150.);
-        UserInformation userInformation = new UserInformation("cooluser","cooluser@gmail.com","Joe","Bob");
+        UserInformation userInformation = new UserInformation(2085,"cooluser","cooluser@gmail.com","Joe","Bob");
         ReservationResponse reservationInformation = new ReservationResponse(2086, userInformation,roomResponse,checkIn,checkOut);
         String reservationInformationJson = mapper.writeValueAsString(reservationInformation);
         JsonPath jsonPath = JsonPath.from(reservationInformationJson);
@@ -191,6 +197,18 @@ public class TokenRequiredTest extends BaseClass{
                 .then()
                 .assertThat().statusCode(HttpStatus.SC_OK)
                 .body("",equalTo(jsonPath.get()));
+
+        //Viewing all reservations for user (1)
+        given().contentType(ContentType.JSON)
+                .headers(headers)
+                .accept(ContentType.JSON)
+                .param("username",usernameTokenCreater.getUsername())
+                .when().get(new URI("/services/reservations/"))
+                .then()
+                .assertThat().statusCode(HttpStatus.SC_OK)
+                .body("content.get(0)", equalTo(jsonPath.get()),
+                        "last", equalTo(true),
+                        "totalElements",equalTo(1));
 
 
         //Testing availability of room at different time intervals

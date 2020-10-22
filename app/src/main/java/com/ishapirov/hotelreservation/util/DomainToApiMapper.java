@@ -16,7 +16,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,13 +49,13 @@ public class DomainToApiMapper {
     public Page<RoomBasicInformation> getBasicRoomsInformation(Page<Room> rooms, Pageable pageable){
         return new PageImpl<>(rooms.getContent().stream()
                 .map(this::getBasicRoomInformation)
-                .collect(Collectors.toList()),pageable,rooms.getContent().size());
+                .collect(Collectors.toList()),pageable,rooms.getTotalElements());
     }
 
     public Page<ReservationInformation> getReservationInformationPage(Page<Reservation> reservations, Pageable pageable){
         return new PageImpl<>(reservations.getContent().stream()
                 .map(this::getReservationInformation)
-                .collect(Collectors.toList()),pageable,reservations.getContent().size());
+                .collect(Collectors.toList()),pageable, reservations.getTotalElements());
     }
 
     public RoomTypeInformation getRoomTypeInformation(RoomType roomType){
@@ -79,14 +78,15 @@ public class DomainToApiMapper {
         ReservationResponse reservationResponse = new ReservationResponse();
         reservationResponse.setReservationNumber(reservation.getReservationNumber());
         reservationResponse.setRoomInformation(getRoomResponse(reservation.getRoom()));
-        reservationResponse.setUserInformation(getCustomerInformation(reservation.getUser()));
+        reservationResponse.setUserInformation(getUserInformation(reservation.getUser()));
         reservationResponse.setCheckInDate(reservation.getCheckInDate());
         reservationResponse.setCheckOutDate(reservation.getCheckOutDate());
         return reservationResponse;
     }
 
-    public UserInformation getCustomerInformation(User user){
+    public UserInformation getUserInformation(User user){
         UserInformation userInformation = new UserInformation();
+        userInformation.setUserID(user.getUserID());
         userInformation.setUsername(user.getUserSecurity().getUsername());
         userInformation.setEmail(user.getEmail());
         userInformation.setFirstName(user.getFirstName());

@@ -44,9 +44,9 @@ public class RoomController implements RoomService {
     private HotelUtil hotelUtil;
 
     @Override
-    public Page<RoomBasicInformation> getRooms(Integer pageNumber, String roomType, Date checkInDate, Date checkOutDate) {
+    public Page<RoomBasicInformation> getRooms(Integer pageNumber,Integer size, String roomType, Date checkInDate, Date checkOutDate) {
         Page<Room> rooms;
-        Pageable pageable = PageRequest.of(pageNumber,100);
+        Pageable pageable = PageRequest.of(pageNumber,size);
         if(roomType == null) {
             rooms = roomRepository.findAll(pageable);
         }

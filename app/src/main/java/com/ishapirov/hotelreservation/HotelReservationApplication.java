@@ -3,11 +3,14 @@ package com.ishapirov.hotelreservation;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.filter.ShallowEtagHeaderFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import javax.servlet.Filter;
+
 @SpringBootApplication
-public class HotelreservationApplication {
+public class HotelReservationApplication {
 
 	@Bean
 	public WebMvcConfigurer corsConfigurer(){
@@ -21,11 +24,15 @@ public class HotelreservationApplication {
 				.allowCredentials(true);
 			}
 		};
+	}
 
+	@Bean
+	public Filter shallowEagFilter(){
+		return new ShallowEtagHeaderFilter();
 	}
 
 	public static void main(String[] args) {
-		SpringApplication.run(HotelreservationApplication.class, args);
+		SpringApplication.run(HotelReservationApplication.class, args);
 	}
 
 }

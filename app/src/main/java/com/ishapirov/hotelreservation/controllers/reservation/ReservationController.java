@@ -55,14 +55,14 @@ public class ReservationController implements ReservationService {
     private DomainToApiMapper domainToApiMapper;
 
     @Override
-    public Page<ReservationInformation> getReservations(String username, Integer pageNumber) {
+    public Page<ReservationInformation> getReservations(Integer pageNumber, Integer size, String username) {
         if(username == null ){
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             boolean hasUserRole = authentication.getAuthorities().stream()
                     .anyMatch(r -> r.getAuthority().equals("ROLE_USER"));
             throw new NotImplementedException("This operation is not yet supported");
         }
-        Pageable pageable = PageRequest.of(pageNumber,10);
+        Pageable pageable = PageRequest.of(pageNumber,size);
         Page<Reservation> reservationPage = reservationRepository.findAllByUser_Username(username,pageable);
         return domainToApiMapper.getReservationInformationPage(reservationPage,pageable);
     }

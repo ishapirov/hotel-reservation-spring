@@ -20,6 +20,7 @@ public interface RoomService {
 
     @GetMapping
     Page<RoomBasicInformation> getRooms(@RequestParam(required = false, defaultValue = "0") @PositiveOrZero Integer pageNumber,
+                                        @RequestParam(required = false, defaultValue = "25") @PositiveOrZero @Max(100) Integer size,
                                         @RequestParam(required = false) @Size(max=32) String roomType,
                                         @RequestParam(required = false) @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME) @FutureOrPresent Date checkInDate,
                                         @RequestParam(required = false) @DateTimeFormat(iso=DateTimeFormat.ISO.DATE_TIME) @FutureOrPresent Date checkOutDate);

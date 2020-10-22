@@ -1,4 +1,4 @@
-package com.ishapirov.hotelreservation.controllers.test;
+package com.ishapirov.hotelreservation.sampledata;
 
 import com.ishapirov.hotelreservation.domain.Room;
 import com.ishapirov.hotelreservation.domain.RoomType;
