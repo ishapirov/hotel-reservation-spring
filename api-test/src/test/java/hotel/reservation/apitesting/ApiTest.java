@@ -59,9 +59,8 @@ public class ApiTest extends BaseClass {
                 .when().get(new URI("/services/rooms"))
                 .then().assertThat()
                 .statusCode(HttpStatus.SC_OK).body("content.size()", equalTo(25),
-                "totalElements", equalTo(100),
-                "size", equalTo(25),
-                "last", equalTo(false),
+                "totalPages", equalTo(4),
+                "hasNextPage", equalTo(true),
                 "content.get(0)", equalTo(jsonPath.get()));
 
         roomInformation = new RoomInformation(2035,"Suite",397.);
@@ -75,13 +74,13 @@ public class ApiTest extends BaseClass {
                 .then().assertThat()
                 .statusCode(HttpStatus.SC_OK).body("content.size()", equalTo(50),
                 "content.get(0)", equalTo(jsonPath.get()),
-                "last",equalTo(true));
+                "hasNextPage",equalTo(false));
 
         given().accept(ContentType.JSON)
                 .param("pageNumber","4")
                 .when().get(new URI("/services/rooms"))
                 .then().assertThat()
-                .statusCode(HttpStatus.SC_OK).body("empty", equalTo(true));
+                .statusCode(HttpStatus.SC_OK).body("content.size()", equalTo(0));
     }
 
     @Test
@@ -132,7 +131,7 @@ public class ApiTest extends BaseClass {
         .accept(ContentType.JSON)
         .when().get(new URI("/services/rooms")).then().assertThat()
         .statusCode(HttpStatus.SC_OK)
-        .body("content.size()",equalTo(24),
+        .body("content.size()",equalTo(25),
                 "content.get(1)",equalTo(jsonPath.get()));
         
     }

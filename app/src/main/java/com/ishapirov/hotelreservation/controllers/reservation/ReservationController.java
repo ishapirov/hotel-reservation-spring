@@ -1,10 +1,12 @@
 package com.ishapirov.hotelreservation.controllers.reservation;
 
 import com.ishapirov.hotelapi.generalexceptions.NotImplementedException;
+import com.ishapirov.hotelapi.pagination.HotelPage;
 import com.ishapirov.hotelapi.reservationservice.domain.ReservationResponse;
 import com.ishapirov.hotelapi.reservationservice.domain.ReservationUpdate;
 import com.ishapirov.hotelapi.reservationservice.domain.admin.CancelReservationForCustomer;
 import com.ishapirov.hotelapi.reservationservice.exceptions.*;
+import com.ishapirov.hotelapi.reservationservice.paramvalidation.ReservationsCriteria;
 import com.ishapirov.hotelapi.roomservice.exceptions.RoomNotFoundException;
 import com.ishapirov.hotelapi.reservationservice.domain.CancelReservation;
 import com.ishapirov.hotelapi.reservationservice.ReservationService;
@@ -55,15 +57,15 @@ public class ReservationController implements ReservationService {
     private DomainToApiMapper domainToApiMapper;
 
     @Override
-    public Page<ReservationInformation> getReservations(Integer pageNumber, Integer size, String username) {
-        if(username == null ){
+    public HotelPage<ReservationInformation> getReservations(ReservationsCriteria reservationsCriteria) {
+        if(reservationsCriteria.getUsername() == null ){
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             boolean hasUserRole = authentication.getAuthorities().stream()
                     .anyMatch(r -> r.getAuthority().equals("ROLE_USER"));
             throw new NotImplementedException("This operation is not yet supported");
         }
-        Pageable pageable = PageRequest.of(pageNumber,size);
-        Page<Reservation> reservationPage = reservationRepository.findAllByUser_Username(username,pageable);
+        Pageable pageable = PageRequest.of(reservationsCriteria.getPageNumber(),reservationsCriteria.getSize());
+        Page<Reservation> reservationPage = reservationRepository.findAllByUser_Username(reservationsCriteria.getUsername(),pageable);
         return domainToApiMapper.getReservationInformationPage(reservationPage,pageable);
     }
 

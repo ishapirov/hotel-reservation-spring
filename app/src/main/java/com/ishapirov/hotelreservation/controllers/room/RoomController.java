@@ -1,7 +1,10 @@
 package com.ishapirov.hotelreservation.controllers.room;
 
 import com.ishapirov.hotelapi.generalexceptions.NotImplementedException;
+import com.ishapirov.hotelapi.pagination.HotelPage;
 import com.ishapirov.hotelapi.reservationservice.exceptions.ReservationOverlapException;
+import com.ishapirov.hotelapi.roomservice.paramvalidation.OneRoomCriteria;
+import com.ishapirov.hotelapi.roomservice.paramvalidation.RoomsCriteria;
 import com.ishapirov.hotelapi.roomservice.domain.RoomUpdate;
 import com.ishapirov.hotelapi.roomservice.exceptions.RoomNotFoundException;
 import com.ishapirov.hotelapi.roomservice.exceptions.RoomTypeNotFoundException;
@@ -24,7 +27,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,34 +46,41 @@ public class RoomController implements RoomService {
     private HotelUtil hotelUtil;
 
     @Override
-    public Page<RoomBasicInformation> getRooms(Integer pageNumber,Integer size, String roomType, Date checkInDate, Date checkOutDate) {
+    public HotelPage<RoomBasicInformation> getRooms(RoomsCriteria roomsCriteria) {
         Page<Room> rooms;
-        Pageable pageable = PageRequest.of(pageNumber,size);
-        if(roomType == null) {
-            rooms = roomRepository.findAll(pageable);
-        }
-        else {
-            Optional<RoomType> getRoomType = roomTypeRepository.findByName(roomType);
-            if (getRoomType.isEmpty())
-                throw new RoomTypeNotFoundException("A room type with the given room type name was not found");
-            rooms = roomRepository.findAllByRoomType(getRoomType.get(),pageable);
-        }
-        if(checkInDate != null || checkOutDate != null){
-            hotelUtil.validateDates(checkInDate, checkOutDate);
-            rooms = hotelUtil.filterRooms(rooms,checkInDate,checkOutDate,pageable);
+        Pageable pageable = PageRequest.of(roomsCriteria.getPageNumber(), roomsCriteria.getSize());
+        if(roomsCriteria.getCheckInDate() != null || roomsCriteria.getCheckOutDate() != null){
+            hotelUtil.validateDates(roomsCriteria.getCheckInDate(), roomsCriteria.getCheckOutDate());
+            if(roomsCriteria.getRoomType() != null) {
+                Optional<RoomType> getRoomType = roomTypeRepository.findByName(roomsCriteria.getRoomType());
+                if(getRoomType.isEmpty())
+                    throw new RoomTypeNotFoundException("A room type with the given room type name was not found");
+                rooms = roomRepository.findAllAvailableAndRoomType(roomsCriteria.getCheckInDate(), roomsCriteria.getCheckOutDate(), getRoomType.get(), pageable);
+            } else {
+                rooms = roomRepository.findAllAvailable(roomsCriteria.getCheckInDate(), roomsCriteria.getCheckOutDate(),pageable);
+            }
+        } else {
+            if(roomsCriteria.getRoomType() != null) {
+                Optional<RoomType> getRoomType = roomTypeRepository.findByName(roomsCriteria.getRoomType());
+                if(getRoomType.isEmpty())
+                    throw new RoomTypeNotFoundException("A room type with the given room type name was not found");
+                rooms = roomRepository.findAllByRoomType(getRoomType.get(), pageable);
+            } else {
+                rooms = roomRepository.findAll(pageable);
+            }
         }
         return domainToApiMapper.getBasicRoomsInformation(rooms,pageable);
     }
 
     @Override
-    public RoomInformation getRoom(Integer roomNumber, Date checkInDate, Date checkOutDate) {
+    public RoomInformation getRoom(Integer roomNumber, OneRoomCriteria oneRoomCriteria) {
         Optional<Room> getRoom = roomRepository.findByRoomNumber(roomNumber);
         if(getRoom.isEmpty())
             throw new RoomNotFoundException("A room with the given room number was not found");
-        if(checkInDate != null || checkOutDate != null){
-            hotelUtil.validateDates(checkInDate,checkOutDate);
+        if(oneRoomCriteria.getCheckInDate() != null || oneRoomCriteria.getCheckOutDate() != null){
+            hotelUtil.validateDates(oneRoomCriteria.getCheckInDate(),oneRoomCriteria.getCheckOutDate());
             List<Reservation> reservations = reservationRepository.findByRoom(getRoom.get());
-            if(!hotelUtil.isDateAvailable(reservations, checkInDate, checkOutDate))
+            if(!hotelUtil.isDateAvailable(reservations, oneRoomCriteria.getCheckInDate(), oneRoomCriteria.getCheckOutDate()))
                 throw new ReservationOverlapException("The room has already been reserved for the given date interval");
         }
         return domainToApiMapper.getRoomInformation(getRoom.get());

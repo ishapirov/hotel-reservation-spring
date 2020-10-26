@@ -9,7 +9,7 @@ import lombok.Data;
 
 @Data
 @MappedSuperclass
-public abstract class DatesInterval {
+public abstract class DateInterval {
     @Column(name = "checkin")
     private Date checkInDate;
     @Column(name = "checkout")

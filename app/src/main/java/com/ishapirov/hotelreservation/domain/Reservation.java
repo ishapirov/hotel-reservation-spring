@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "reservation")
 @EqualsAndHashCode(callSuper = true)
-public class Reservation extends DatesInterval implements Serializable{
+public class Reservation extends DateInterval implements Serializable{
     private static final long serialVersionUID = -5960526503459035821L;
 
 	@Id

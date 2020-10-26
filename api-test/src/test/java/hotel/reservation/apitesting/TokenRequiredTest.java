@@ -207,8 +207,8 @@ public class TokenRequiredTest extends BaseClass{
                 .then()
                 .assertThat().statusCode(HttpStatus.SC_OK)
                 .body("content.get(0)", equalTo(jsonPath.get()),
-                        "last", equalTo(true),
-                        "totalElements",equalTo(1));
+                        "hasNextPage", equalTo(false),
+                        "totalPages",equalTo(1));
 
 
         //Testing availability of room at different time intervals

@@ -1,17 +1,17 @@
 package com.ishapirov.hotelapi.reservationservice;
 
+import com.ishapirov.hotelapi.pagination.HotelPage;
 import com.ishapirov.hotelapi.reservationservice.domain.*;
 import com.ishapirov.hotelapi.reservationservice.domain.admin.BookRoomForCustomer;
 import com.ishapirov.hotelapi.reservationservice.domain.admin.CancelReservationForCustomer;
+import com.ishapirov.hotelapi.reservationservice.paramvalidation.ReservationsCriteria;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Max;
 import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
 
 @RestController
 @Validated
@@ -19,9 +19,7 @@ import javax.validation.constraints.PositiveOrZero;
 public interface ReservationService {
 
     @GetMapping
-    Page<ReservationInformation> getReservations(@RequestParam(required = false, defaultValue = "0") @PositiveOrZero Integer pageNumber,
-                                                 @RequestParam(required = false, defaultValue = "10") @PositiveOrZero @Max(100) Integer size,
-                                                 @RequestParam(required = false) String username);
+    HotelPage<ReservationInformation> getReservations(@Valid ReservationsCriteria reservationsCriteria);
 
     @GetMapping("/{reservationNumber}")
     ReservationInformation getReservation(@PathVariable @Positive Integer reservationNumber);

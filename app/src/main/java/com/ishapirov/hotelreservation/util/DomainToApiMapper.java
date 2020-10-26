@@ -1,5 +1,6 @@
 package com.ishapirov.hotelreservation.util;
 
+import com.ishapirov.hotelapi.pagination.HotelPage;
 import com.ishapirov.hotelapi.reservationservice.domain.ReservationResponse;
 import com.ishapirov.hotelapi.roomservice.domain.RoomBasicInformation;
 import com.ishapirov.hotelapi.roomservice.domain.RoomResponse;
@@ -46,16 +47,16 @@ public class DomainToApiMapper {
     }
 
 
-    public Page<RoomBasicInformation> getBasicRoomsInformation(Page<Room> rooms, Pageable pageable){
-        return new PageImpl<>(rooms.getContent().stream()
+    public HotelPage<RoomBasicInformation> getBasicRoomsInformation(Page<Room> rooms, Pageable pageable){
+        return new HotelPage<RoomBasicInformation>(rooms.getContent().stream()
                 .map(this::getBasicRoomInformation)
-                .collect(Collectors.toList()),pageable,rooms.getTotalElements());
+                .collect(Collectors.toList()),rooms.getTotalPages(),rooms.hasNext());
     }
 
-    public Page<ReservationInformation> getReservationInformationPage(Page<Reservation> reservations, Pageable pageable){
-        return new PageImpl<>(reservations.getContent().stream()
+    public HotelPage<ReservationInformation> getReservationInformationPage(Page<Reservation> reservations, Pageable pageable){
+        return new HotelPage<ReservationInformation>(reservations.getContent().stream()
                 .map(this::getReservationInformation)
-                .collect(Collectors.toList()),pageable, reservations.getTotalElements());
+                .collect(Collectors.toList()),reservations.getTotalPages(),reservations.hasNext());
     }
 
     public RoomTypeInformation getRoomTypeInformation(RoomType roomType){
