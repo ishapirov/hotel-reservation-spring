@@ -1,4 +1,4 @@
-package hotel.reservation.apitesting;
+package hotel.reservation.apitesting.tests.setup;
 
 import static io.restassured.RestAssured.*;
 

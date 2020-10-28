@@ -1,7 +1,8 @@
-package hotel.reservation.apitesting;
+package hotel.reservation.apitesting.tests;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ishapirov.hotelapi.roomservice.domain.RoomInformation;
+import hotel.reservation.apitesting.tests.setup.BaseClass;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import org.apache.http.HttpStatus;

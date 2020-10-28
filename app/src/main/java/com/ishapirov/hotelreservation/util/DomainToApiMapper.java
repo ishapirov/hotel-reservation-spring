@@ -1,6 +1,7 @@
 package com.ishapirov.hotelreservation.util;
 
 import com.ishapirov.hotelapi.pagination.HotelPage;
+import com.ishapirov.hotelapi.reservationservice.domain.ReservationBasicInformation;
 import com.ishapirov.hotelapi.reservationservice.domain.ReservationResponse;
 import com.ishapirov.hotelapi.roomservice.domain.RoomBasicInformation;
 import com.ishapirov.hotelapi.roomservice.domain.RoomResponse;
@@ -53,10 +54,16 @@ public class DomainToApiMapper {
                 .collect(Collectors.toList()),rooms.getTotalPages(),rooms.hasNext());
     }
 
-    public HotelPage<ReservationInformation> getReservationInformationPage(Page<Reservation> reservations, Pageable pageable){
-        return new HotelPage<ReservationInformation>(reservations.getContent().stream()
-                .map(this::getReservationInformation)
+    public HotelPage<ReservationBasicInformation> getReservationInformationPage(Page<Reservation> reservations, Pageable pageable){
+        return new HotelPage<ReservationBasicInformation>(reservations.getContent().stream()
+                .map(this::getReservationBasicInformation)
                 .collect(Collectors.toList()),reservations.getTotalPages(),reservations.hasNext());
+    }
+
+    public HotelPage<UserInformation> getUserInformationPage(Page<User> users, Pageable pageable){
+        return new HotelPage<UserInformation>(users.getContent().stream()
+                .map(this::getUserInformation)
+                .collect(Collectors.toList()),users.getTotalPages(),users.hasNext());
     }
 
     public RoomTypeInformation getRoomTypeInformation(RoomType roomType){
@@ -73,6 +80,16 @@ public class DomainToApiMapper {
         reservationInformation.setCheckInDate(reservation.getCheckInDate());
         reservationInformation.setCheckOutDate(reservation.getCheckOutDate());
         return reservationInformation;
+    }
+
+    public ReservationBasicInformation getReservationBasicInformation(Reservation reservation){
+        ReservationBasicInformation reservationBasicInformation = new ReservationBasicInformation();
+        reservationBasicInformation.setReservationNumber(reservation.getReservationNumber());
+        reservationBasicInformation.setRoomNumber(reservation.getRoom().getRoomNumber());
+        reservationBasicInformation.setUsername(reservation.getUser().getUserSecurity().getUsername());
+        reservationBasicInformation.setCheckInDate(reservation.getCheckInDate());
+        reservationBasicInformation.setCheckOutDate(reservation.getCheckOutDate());
+        return reservationBasicInformation;
     }
 
     public ReservationResponse getReservationResponse(Reservation reservation){

@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RestController;
@@ -48,7 +49,7 @@ public class RoomController implements RoomService {
     @Override
     public HotelPage<RoomBasicInformation> getRooms(RoomsCriteria roomsCriteria) {
         Page<Room> rooms;
-        Pageable pageable = PageRequest.of(roomsCriteria.getPageNumber(), roomsCriteria.getSize());
+        Pageable pageable = PageRequest.of(roomsCriteria.getPageNumber(), roomsCriteria.getSize(), Sort.by("roomNumber"));
         if(roomsCriteria.getCheckInDate() != null || roomsCriteria.getCheckOutDate() != null){
             hotelUtil.validateDates(roomsCriteria.getCheckInDate(), roomsCriteria.getCheckOutDate());
             if(roomsCriteria.getRoomType() != null) {
@@ -89,6 +90,19 @@ public class RoomController implements RoomService {
     @Override
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public RoomInformation updateRoom(Integer roomNumber, RoomUpdate roomUpdate) {
-        throw new NotImplementedException("This operation is not yet supported");
+        Optional<Room> getRoom = roomRepository.findByRoomNumber(roomNumber);
+        if(getRoom.isEmpty())
+            throw new RoomNotFoundException("A room with the given room number was not found");
+
+        Room room = getRoom.get();
+        room.setRoomPrice(roomUpdate.getRoomPrice());
+        if(roomUpdate.getRoomType() != null){
+            Optional<RoomType> getRoomType = roomTypeRepository.findByName(roomUpdate.getRoomType());
+            if(getRoomType.isEmpty())
+                throw new RoomTypeNotFoundException("A room type with the given room type name was not found");
+            room.setRoomType(getRoomType.get());
+        }
+        roomRepository.save(room);
+        return domainToApiMapper.getRoomInformation(room);
     }
 }

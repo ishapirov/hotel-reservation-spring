@@ -1,4 +1,4 @@
-package hotel.reservation.apitesting;
+package hotel.reservation.apitesting.datafortests;
 
 import java.sql.Date;
 import java.util.HashMap;
@@ -9,14 +9,15 @@ import org.apache.commons.lang3.RandomStringUtils;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
-public class UsernameTokenCreater {
+public class UsernameTokenCreator {
 
-    private static UsernameTokenCreater instance = new UsernameTokenCreater(864_000_000,  "73AEBDFC5F371E413F8F1EF0E0E388E8CFB72B4BCCE4C1E023C85301779E456E");
+    private static UsernameTokenCreator instance = new UsernameTokenCreator(864_000_000,  "73AEBDFC5F371E413F8F1EF0E0E388E8CFB72B4BCCE4C1E023C85301779E456E");
     private final String username;
     private final String token;
-    private final String existingToken;
+    private final String existingUserToken;
+    private final String existingAdminToken;
 
-    private UsernameTokenCreater(long expiration,String secret) {
+    private UsernameTokenCreator(long expiration, String secret) {
         int length = 32;
         boolean useLetters = true;
         boolean useNumbers = true;
@@ -30,15 +31,22 @@ public class UsernameTokenCreater {
                 .signWith(SignatureAlgorithm.HS256, secret)
                 .compact();
 
-        existingToken = "Bearer " + Jwts.builder()
+        existingUserToken = "Bearer " + Jwts.builder()
                 .setClaims(claims)
                 .setSubject("cooluser")
-                .setExpiration(new Date(System.currentTimeMillis() + 864_000_000))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(SignatureAlgorithm.HS256, "73AEBDFC5F371E413F8F1EF0E0E388E8CFB72B4BCCE4C1E023C85301779E456E")
+                .compact();
+
+        existingAdminToken = "Bearer " + Jwts.builder()
+                .setClaims(claims)
+                .setSubject("admin")
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(SignatureAlgorithm.HS256, "73AEBDFC5F371E413F8F1EF0E0E388E8CFB72B4BCCE4C1E023C85301779E456E")
                 .compact();
     }
 
-    public static UsernameTokenCreater getInstance(){
+    public static UsernameTokenCreator getInstance(){
         return instance;
     }
     
@@ -50,7 +58,11 @@ public class UsernameTokenCreater {
         return token;
     }
 
-    public String getExistingToken() {
-        return existingToken;
+    public String getExistingUserToken() {
+        return existingUserToken;
+    }
+
+    public String getExistingAdminToken() {
+        return existingAdminToken;
     }
 }

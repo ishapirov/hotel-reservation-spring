@@ -38,13 +38,30 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().disable();
         http.csrf().disable()
-                .authorizeRequests().antMatchers("/services/authentication/**",
-                                                 "/services/rooms",
-                                                 "/services/rooms/**",
-                                                 "/services/reservations",
-                                                 "/services/users",
-                                                 "/api-docs/**")
-                .permitAll()
+                .authorizeRequests()
+                .antMatchers(HttpMethod.POST,"/services/authentication").permitAll()
+
+                .antMatchers(HttpMethod.POST,"/services/users").permitAll()
+                .antMatchers(HttpMethod.GET,"/services/users/*").authenticated()
+                .antMatchers(HttpMethod.PUT,"/services/users/*").authenticated()
+                .antMatchers(HttpMethod.DELETE,"/services/users/*").authenticated()
+                .antMatchers(HttpMethod.GET,"/services/users").hasRole("ADMIN")
+                .antMatchers(HttpMethod.POST,"/services/users/admin").hasRole("ADMIN")
+
+                .antMatchers(HttpMethod.GET,"/services/rooms").permitAll()
+                .antMatchers(HttpMethod.GET,"/services/rooms/*").permitAll()
+                .antMatchers(HttpMethod.PUT,"/services/rooms/*").hasRole("ADMIN")
+
+                .antMatchers(HttpMethod.GET,"/services/reservations").authenticated()
+                .antMatchers(HttpMethod.GET,"/services/reservations/*").authenticated()
+                .antMatchers(HttpMethod.POST,"/services/reservations").authenticated()
+                .antMatchers(HttpMethod.PUT,"/services/reservations/*").authenticated()
+                .antMatchers(HttpMethod.DELETE,"/services/reservations/*").authenticated()
+                .antMatchers(HttpMethod.POST,"/services/reservations/cancel").authenticated()
+                .antMatchers(HttpMethod.GET,"/services/reservations/response/*").authenticated()
+                .antMatchers(HttpMethod.POST,"/services/reservations/admin").hasRole("ADMIN")
+                .antMatchers(HttpMethod.POST,"/services/reservations/admin/cancel").hasRole("ADMIN")
+
                 .antMatchers(HttpMethod.OPTIONS,"/**").permitAll()
                 .anyRequest().authenticated()
                 .and().exceptionHandling()

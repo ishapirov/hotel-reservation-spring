@@ -14,7 +14,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 public interface RoomRepository extends PagingAndSortingRepository<Room,Integer> {
     Optional<Room> findByRoomNumber(int roomNumber);
     Page<Room> findAllByRoomType(RoomType roomType, Pageable page);
-    Page<Room> findAll(org.springframework.data.domain.Pageable page);
+    Page<Room> findAll(Pageable page);
 
     @Query("SELECT r FROM Room r WHERE r NOT IN " +
             "(SELECT res.room FROM Reservation res WHERE " +

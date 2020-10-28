@@ -32,6 +32,17 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<ExceptionResponse>(response, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(UnauthorizedAccessException.class)
+    public ResponseEntity<ExceptionResponse> unauthorizedAccess(UnauthorizedAccessException unauthorizedAccessException){
+        ExceptionResponse response = new ExceptionResponse();
+        response.setTimestamp(LocalDateTime.now());
+        response.setStatus(403);
+        response.setError("FORBIDDEN");
+        response.setMessage(unauthorizedAccessException.getMessage());
+
+        return new ResponseEntity<ExceptionResponse>(response, HttpStatus.FORBIDDEN);
+    }
+
     @ExceptionHandler(DatesInvalidException.class)
     public ResponseEntity<ExceptionResponse> datesInvalid(DatesInvalidException datesInvalidException){
         ExceptionResponse response = new ExceptionResponse();
@@ -65,13 +76,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<ExceptionResponse>(response, HttpStatus.UNAUTHORIZED);
     }
 
-    @ExceptionHandler(ReservationCreationError.class)
-    public ResponseEntity<ExceptionResponse> reservationCreationError(ReservationCreationError reservationCreationError){
+    @ExceptionHandler(ReservationDeletionError.class)
+    public ResponseEntity<ExceptionResponse> reservationCreationError(ReservationDeletionError reservationDeletionError){
         ExceptionResponse response = new ExceptionResponse();
         response.setTimestamp(LocalDateTime.now());
         response.setStatus(500);
         response.setError("INTERNAL_SERVER_ERROR");
-        response.setMessage(reservationCreationError.getMessage());
+        response.setMessage(reservationDeletionError.getMessage());
 
         return new ResponseEntity<ExceptionResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }

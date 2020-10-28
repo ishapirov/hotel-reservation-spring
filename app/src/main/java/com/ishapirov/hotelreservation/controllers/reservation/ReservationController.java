@@ -2,16 +2,12 @@ package com.ishapirov.hotelreservation.controllers.reservation;
 
 import com.ishapirov.hotelapi.generalexceptions.NotImplementedException;
 import com.ishapirov.hotelapi.pagination.HotelPage;
-import com.ishapirov.hotelapi.reservationservice.domain.ReservationResponse;
-import com.ishapirov.hotelapi.reservationservice.domain.ReservationUpdate;
+import com.ishapirov.hotelapi.reservationservice.domain.*;
 import com.ishapirov.hotelapi.reservationservice.domain.admin.CancelReservationForCustomer;
 import com.ishapirov.hotelapi.reservationservice.exceptions.*;
 import com.ishapirov.hotelapi.reservationservice.paramvalidation.ReservationsCriteria;
 import com.ishapirov.hotelapi.roomservice.exceptions.RoomNotFoundException;
-import com.ishapirov.hotelapi.reservationservice.domain.CancelReservation;
 import com.ishapirov.hotelapi.reservationservice.ReservationService;
-import com.ishapirov.hotelapi.reservationservice.domain.BookRoom;
-import com.ishapirov.hotelapi.reservationservice.domain.ReservationInformation;
 import com.ishapirov.hotelapi.reservationservice.domain.admin.BookRoomForCustomer;
 import com.ishapirov.hotelapi.userservice.exceptions.CustomerNotFoundException;
 import com.ishapirov.hotelreservation.domain.Reservation;
@@ -57,7 +53,7 @@ public class ReservationController implements ReservationService {
     private DomainToApiMapper domainToApiMapper;
 
     @Override
-    public HotelPage<ReservationInformation> getReservations(ReservationsCriteria reservationsCriteria) {
+    public HotelPage<ReservationBasicInformation> getReservations(ReservationsCriteria reservationsCriteria) {
         if(reservationsCriteria.getUsername() == null ){
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             boolean hasUserRole = authentication.getAuthorities().stream()
@@ -90,8 +86,24 @@ public class ReservationController implements ReservationService {
     }
 
     @Override
+    @Transactional
     public ReservationInformation updateReservation(Integer reservationNumber, ReservationUpdate reservationUpdate) {
+//        Optional<Reservation> getReservation = reservationRepository.findByReservationNumber(reservationNumber);
+//        if(getReservation.isEmpty())
+//            throw new ReservationNotFoundException("The reservation with the given ID was not found");
+//        Reservation reservation = getReservation.get();
+
         throw new NotImplementedException("This operation is not yet supported");
+    }
+
+    @Override
+    @Transactional
+    public void deleteReservation(Integer reservationNumber) {
+        Optional<Reservation> reservation = reservationRepository.findByReservationNumber(reservationNumber);
+        if(reservation.isEmpty())
+            throw new ReservationNotFoundException("A reservation with the given reservation number was not found");
+        if(reservationRepository.deleteByReservationNumber(reservationNumber) != 1)
+            throw new ReservationDeletionError("Error while deleting reservation");
     }
 
     @Override
@@ -99,8 +111,6 @@ public class ReservationController implements ReservationService {
         Optional<Reservation> getReservation = reservationRepository.findByReservationNumber(cancelReservation.getReservationNumber());
         if(getReservation.isEmpty())
             throw new ReservationNotFoundException("A reservation with the given reservation number was not found");
-        if(reservationRepository.deleteByReservationNumber(cancelReservation.getReservationNumber()) != 1)
-            throw new ReservationCreationError("Error while creating reservation");
         Reservation reservation = getReservation.get();
         if(reservation.isCancelled())
             throw new ReservationAlreadyCancelledException("This reservation has already been cancelled");
@@ -121,19 +131,9 @@ public class ReservationController implements ReservationService {
         return domainToApiMapper.getReservationResponse(userReservation);
     }
 
-    @Override
-    @Transactional
-//    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public void deleteReservation(Integer reservationNumber) {
-        Optional<Reservation> reservation = reservationRepository.findByReservationNumber(reservationNumber);
-        if(reservation.isEmpty())
-            throw new ReservationNotFoundException("A reservation with the given reservation number was not found");
-        if(reservationRepository.deleteByReservationNumber(reservationNumber) != 1)
-            throw new ReservationCreationError("Error while creating reservation");
-    }
+
 
     @Override
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ReservationInformation bookRoomForCustomer(BookRoomForCustomer bookRoomForCustomer) {
         Optional<User> customer = userRepository.findByUsername(bookRoomForCustomer.getUsername());
         Optional<Room> room = roomRepository.findByRoomNumber(bookRoomForCustomer.getRoomNumber());
@@ -156,7 +156,6 @@ public class ReservationController implements ReservationService {
     }
 
     @Override
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ReservationInformation cancelRoomForCustomer(CancelReservationForCustomer cancelReservation) {
         throw new NotImplementedException("This operation is not yet supported");
     }

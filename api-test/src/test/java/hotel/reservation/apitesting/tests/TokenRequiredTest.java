@@ -1,4 +1,4 @@
-package hotel.reservation.apitesting;
+package hotel.reservation.apitesting.tests;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -21,6 +21,9 @@ import com.ishapirov.hotelapi.roomservice.domain.RoomTypeInformation;
 import com.ishapirov.hotelapi.reservationservice.domain.BookRoom;
 import com.ishapirov.hotelapi.authenticationservice.credentials.UserCredentials;
 import com.ishapirov.hotelapi.userservice.domain.UserSignupInformation;
+import hotel.reservation.apitesting.tests.setup.BaseClass;
+import hotel.reservation.apitesting.mapper.MyObjectMapper;
+import hotel.reservation.apitesting.datafortests.UsernameTokenCreator;
 import org.apache.http.HttpStatus;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -31,20 +34,20 @@ import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TokenRequiredTest extends BaseClass{
+public class TokenRequiredTest extends BaseClass {
 
     private MyObjectMapper mapper = new MyObjectMapper();
 
-    private UsernameTokenCreater usernameTokenCreater = UsernameTokenCreater.getInstance();
+    private UsernameTokenCreator usernameTokenCreator = UsernameTokenCreator.getInstance();
 
     @Test
     public void firstTestSignup() throws JsonProcessingException, URISyntaxException {
 
-        UserSignupInformation testCustomer = new UserSignupInformation(usernameTokenCreater.getUsername(),"Coolpass-123","test@email.com","Test","User");
+        UserSignupInformation testCustomer = new UserSignupInformation(usernameTokenCreator.getUsername(),"Coolpass-123","test@email.com","Test","User");
         String json = mapper.writeValueAsString(testCustomer);
 
         UserInformation userInformation = new UserInformation();
-        userInformation.setUsername(usernameTokenCreater.getUsername());
+        userInformation.setUsername(usernameTokenCreator.getUsername());
         userInformation.setEmail("test@email.com");
         userInformation.setFirstName("Test");
         userInformation.setLastName("User");
@@ -97,7 +100,7 @@ public class TokenRequiredTest extends BaseClass{
 
     @Test
     public void testViewReservation() throws URISyntaxException, JsonProcessingException, ParseException {
-        String token = usernameTokenCreater.getExistingToken();
+        String token = usernameTokenCreator.getExistingUserToken();
         Map<String,String> headers = new HashMap<>();
         headers.put("Authorization", token);
         StdDateFormat format = new StdDateFormat();
@@ -119,7 +122,7 @@ public class TokenRequiredTest extends BaseClass{
 
     @Test
     public void testViewReservationResponse() throws URISyntaxException, JsonProcessingException, ParseException {
-        String token = usernameTokenCreater.getExistingToken();
+        String token = usernameTokenCreator.getExistingUserToken();
         Map<String,String> headers = new HashMap<>();
         headers.put("Authorization", token);
         StdDateFormat format = new StdDateFormat();
@@ -144,7 +147,7 @@ public class TokenRequiredTest extends BaseClass{
 
     @Test
     public void testViewForbiddenReservation() throws URISyntaxException, JsonProcessingException {
-        String token = usernameTokenCreater.getToken();
+        String token = usernameTokenCreator.getToken();
         Map<String,String> headers = new HashMap<>();
         headers.put("Authorization",token);
 
@@ -160,7 +163,7 @@ public class TokenRequiredTest extends BaseClass{
 
     @Test
     public void testBookRoomThenVerifyThenCancel() throws JsonProcessingException, URISyntaxException, ParseException {
-        String token = usernameTokenCreater.getToken();
+        String token = usernameTokenCreator.getToken();
         Map<String,String> headers = new HashMap<>();
         headers.put("Authorization",token);
 
@@ -182,7 +185,7 @@ public class TokenRequiredTest extends BaseClass{
         JsonPath jsonPath = new JsonPath(response.thenReturn().asString());
         int reservationNumber = jsonPath.getInt("reservationNumber");
 
-        ReservationInformation reservationInformation = new ReservationInformation(reservationNumber, usernameTokenCreater.getUsername(),roomNumber,d1,d2);
+        ReservationInformation reservationInformation = new ReservationInformation(reservationNumber, usernameTokenCreator.getUsername(),roomNumber,d1,d2);
         String reservationInformationJson = mapper.writeValueAsString(reservationInformation);
         jsonPath = JsonPath.from(reservationInformationJson);
 
@@ -202,7 +205,7 @@ public class TokenRequiredTest extends BaseClass{
         given().contentType(ContentType.JSON)
                 .headers(headers)
                 .accept(ContentType.JSON)
-                .param("username",usernameTokenCreater.getUsername())
+                .param("username", usernameTokenCreator.getUsername())
                 .when().get(new URI("/services/reservations/"))
                 .then()
                 .assertThat().statusCode(HttpStatus.SC_OK)
@@ -261,4 +264,6 @@ public class TokenRequiredTest extends BaseClass{
             .then().assertThat().statusCode(HttpStatus.SC_NO_CONTENT);
 
     }
+
+
 }

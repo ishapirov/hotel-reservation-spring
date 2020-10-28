@@ -1,4 +1,4 @@
-package hotel.reservation.apitesting;
+package hotel.reservation.apitesting.mapper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
