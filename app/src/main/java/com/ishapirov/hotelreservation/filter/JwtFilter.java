@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.ishapirov.hotelreservation.authentication.ApplicationUserService;
-import com.ishapirov.hotelreservation.util.JwtUtil;
+import com.ishapirov.hotelreservation.jwt.JwtUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

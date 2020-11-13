@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
-import com.ishapirov.hotelapi.userservice.domain.UserSignupInformation;
+import com.ishapirov.hotelapi.services.user.domain.UserSignupInformation;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

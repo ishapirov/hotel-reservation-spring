@@ -16,8 +16,27 @@ public interface RoomRepository extends PagingAndSortingRepository<Room,Integer>
     Page<Room> findAllByRoomType(RoomType roomType, Pageable page);
     Page<Room> findAll(Pageable page);
 
+
+    @Query("SELECT r FROM Room r WHERE r.roomNumber = ?3 AND r NOT IN " +
+            "(SELECT res.room FROM Reservation res WHERE " +
+            "res.cancelled = false AND" +
+            "((res.checkInDate >= ?1 AND res.checkInDate < ?2)" +
+            "OR (res.checkOutDate > ?1 AND res.checkOutDate <= ?2)" +
+            "OR (res.checkInDate <= ?1 AND res.checkOutDate >= ?2)))")
+    Optional<Room> findByRoomNumberIfAvailable(Date checkInDate, Date checkOutDate,int roomNumber);
+
+    @Query("SELECT r FROM Room r WHERE r.roomNumber = ?3 AND r NOT IN " +
+            "(SELECT res.room FROM Reservation res WHERE " +
+            "res.cancelled = false AND res.reservationNumber != ?4 AND" +
+            "((res.checkInDate >= ?1 AND res.checkInDate < ?2)" +
+            "OR (res.checkOutDate > ?1 AND res.checkOutDate <= ?2)" +
+            "OR (res.checkInDate <= ?1 AND res.checkOutDate >= ?2)))")
+    Optional<Room> findByRoomNumberIfAvailableExcludingOneReservation(Date checkInDate, Date checkOutDate,int roomNumber,int reservationNumber);
+
+
     @Query("SELECT r FROM Room r WHERE r NOT IN " +
             "(SELECT res.room FROM Reservation res WHERE " +
+            "res.cancelled = false AND" +
             "((res.checkInDate >= ?1 AND res.checkInDate < ?2)" +
             "OR (res.checkOutDate > ?1 AND res.checkOutDate <= ?2)" +
             "OR (res.checkInDate <= ?1 AND res.checkOutDate >= ?2)))")
@@ -25,8 +44,11 @@ public interface RoomRepository extends PagingAndSortingRepository<Room,Integer>
 
     @Query("SELECT r FROM Room r WHERE r.roomType = ?3 AND r NOT IN " +
             "(SELECT res.room FROM Reservation res WHERE " +
+            "res.cancelled = false AND" +
             "((res.checkInDate >= ?1 AND res.checkInDate < ?2)" +
             "OR (res.checkOutDate > ?1 AND res.checkOutDate <= ?2)" +
             "OR (res.checkInDate <= ?1 AND res.checkOutDate >= ?2)))")
     Page<Room> findAllAvailableAndRoomType(Date checkInDate, Date checkOutDate,RoomType roomType, Pageable pageable);
+
+
 }

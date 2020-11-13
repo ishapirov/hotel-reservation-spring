@@ -1,10 +1,8 @@
 package com.ishapirov.hotelreservation.domain;
 
-import com.ishapirov.hotelapi.userservice.domain.UserSignupInformation;
-import com.ishapirov.hotelreservation.repositories.RoleRepository;
+import com.ishapirov.hotelapi.services.user.domain.UserSignupInformation;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -18,8 +16,6 @@ public class UserSecurity {
     @Id
     private String username;
     private String password;
-
-
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(

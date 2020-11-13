@@ -1,14 +1,13 @@
 package com.ishapirov.hotelreservation.controllers.authentication;
 
-import com.ishapirov.hotelapi.authenticationservice.AuthenticationService;
-import com.ishapirov.hotelapi.authenticationservice.credentials.UserCredentials;
-import com.ishapirov.hotelapi.authenticationservice.token.Token;
-import com.ishapirov.hotelapi.authenticationservice.exceptions.InvalidUsernameOrPasswordException;
-import com.ishapirov.hotelreservation.util.JwtUtil;
+import com.ishapirov.hotelapi.services.authentication.AuthenticationService;
+import com.ishapirov.hotelapi.services.authentication.credentials.UserCredentials;
+import com.ishapirov.hotelapi.services.authentication.token.Token;
+import com.ishapirov.hotelapi.services.authentication.exceptions.InvalidUsernameOrPasswordException;
+import com.ishapirov.hotelreservation.jwt.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController

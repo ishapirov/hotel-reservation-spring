@@ -1,13 +1,13 @@
 package com.ishapirov.hotelreservation.exceptions;
 
-import com.ishapirov.hotelapi.authenticationservice.exceptions.InvalidUsernameOrPasswordException;
+import com.ishapirov.hotelapi.services.authentication.exceptions.InvalidUsernameOrPasswordException;
 import com.ishapirov.hotelapi.exceptionresponse.ExceptionResponse;
 import com.ishapirov.hotelapi.exceptionresponse.Violation;
 import com.ishapirov.hotelapi.generalexceptions.*;
-import com.ishapirov.hotelapi.reservationservice.exceptions.*;
-import com.ishapirov.hotelapi.roomservice.exceptions.RoomNotFoundException;
-import com.ishapirov.hotelapi.roomservice.exceptions.RoomTypeNotFoundException;
-import com.ishapirov.hotelapi.userservice.exceptions.CustomerNotFoundException;
+import com.ishapirov.hotelapi.services.reservation.exceptions.*;
+import com.ishapirov.hotelapi.services.room.exceptions.RoomNotFoundException;
+import com.ishapirov.hotelapi.services.room.exceptions.RoomTypeNotFoundException;
+import com.ishapirov.hotelapi.services.user.exceptions.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -21,13 +21,13 @@ import java.time.LocalDateTime;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(CustomerNotFoundException.class)
-    public ResponseEntity<ExceptionResponse> customerNotFound(CustomerNotFoundException customerNotFoundException){
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> customerNotFound(UserNotFoundException userNotFoundException){
         ExceptionResponse response = new ExceptionResponse();
         response.setTimestamp(LocalDateTime.now());
         response.setStatus(404);
         response.setError("NOT_FOUND");
-        response.setMessage(customerNotFoundException.getMessage());
+        response.setMessage(userNotFoundException.getMessage());
 
         return new ResponseEntity<ExceptionResponse>(response, HttpStatus.NOT_FOUND);
     }

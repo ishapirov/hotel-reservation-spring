@@ -44,7 +44,7 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST,"/services/users").permitAll()
                 .antMatchers(HttpMethod.GET,"/services/users/*").authenticated()
                 .antMatchers(HttpMethod.PUT,"/services/users/*").authenticated()
-                .antMatchers(HttpMethod.DELETE,"/services/users/*").authenticated()
+                .antMatchers(HttpMethod.DELETE,"/services/users/*").hasRole("ADMIN")
                 .antMatchers(HttpMethod.GET,"/services/users").hasRole("ADMIN")
                 .antMatchers(HttpMethod.POST,"/services/users/admin").hasRole("ADMIN")
 
@@ -56,7 +56,7 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET,"/services/reservations/*").authenticated()
                 .antMatchers(HttpMethod.POST,"/services/reservations").authenticated()
                 .antMatchers(HttpMethod.PUT,"/services/reservations/*").authenticated()
-                .antMatchers(HttpMethod.DELETE,"/services/reservations/*").authenticated()
+                .antMatchers(HttpMethod.DELETE,"/services/reservations/*").hasRole("ADMIN")
                 .antMatchers(HttpMethod.POST,"/services/reservations/cancel").authenticated()
                 .antMatchers(HttpMethod.GET,"/services/reservations/response/*").authenticated()
                 .antMatchers(HttpMethod.POST,"/services/reservations/admin").hasRole("ADMIN")

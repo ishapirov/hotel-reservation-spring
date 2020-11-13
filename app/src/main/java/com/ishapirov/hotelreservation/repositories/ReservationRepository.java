@@ -16,5 +16,4 @@ public interface ReservationRepository extends PagingAndSortingRepository<Reserv
     List<Reservation> findByRoom(Room room);
     List<Reservation> findByRoomAndCancelled(Room room,boolean cancelled);
     Page<Reservation> findAllByUser_Username(String username, Pageable page);
-    Long deleteByReservationNumber(Integer reservationNumber);
 }
