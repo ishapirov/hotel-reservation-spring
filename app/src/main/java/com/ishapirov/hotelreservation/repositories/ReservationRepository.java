@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ReservationRepository extends PagingAndSortingRepository<Reservation,Integer> {
-    Optional<Reservation>findByReservationNumber(Integer reservationNumber);
+    Optional<Reservation> findByReservationNumber(Integer reservationNumber);
     List<Reservation> findByRoom(Room room);
     List<Reservation> findByRoomAndCancelled(Room room,boolean cancelled);
     Page<Reservation> findAllByUser_Username(String username, Pageable page);
